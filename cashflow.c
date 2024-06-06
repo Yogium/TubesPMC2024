@@ -9,10 +9,10 @@ Nama File       : cashflow.c
 */
 
 #include <stdio.h>
-#include <struct.h>
 #include <stdlib.h>
 #include <string.h>
 #include <ctype.h>
+#include "struct.h"
 
 int income_monthly(DataKunjungan *head, int month, int year){
     DataKunjungan *curr = head;
