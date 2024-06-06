@@ -1,4 +1,6 @@
-//Nicholas Darren
+//Nama : Nicholas Darren
+//Nama file : deletePatient.c
+//Deskripsi : Fungsi ini untuk menghapus pasien (dengan input ID)
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
