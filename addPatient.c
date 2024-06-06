@@ -9,7 +9,7 @@
 #include "parsingDate.c"
 #include "LinkedList.c"
 
-date parseDate(char* dateString, char* original);
+date parseDate(char* dateString, char* original); //Deklarasi fungsi
 
 void addPatient(DataPasien** head) {
     DataPasien* newNode = createDataPasienNode();
