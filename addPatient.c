@@ -1,4 +1,6 @@
 //Nama : Nicholas Darren
+//Nama file : addPatient.c
+// Deskripsi : Fungsi ini untuk Menambahkan Pasien Baru
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
