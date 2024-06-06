@@ -12,14 +12,17 @@ Nama File       : cashflow.c
 #include <stdlib.h>
 #include <string.h>
 #include <ctype.h>
+#include <locale.h>
 #include "struct.h"
+#include "LinkedList.c"
+
 
 int income_monthly(DataKunjungan *head, int month, int year){
     DataKunjungan *curr = head;
     int income = 0;
     while(curr != NULL){
         if(curr->tanggal.month == month && curr->tanggal.year == year){
-            income += tindakan[curr->tindakan].biaya + 140000 //biaya pemeriksaan dan pendaftaran;
+            income += tindakan[curr->tindakan].biaya + 140000; //biaya pemeriksaan dan pendaftaran;
         }
         curr = curr->next;
     }
@@ -31,7 +34,7 @@ int income_yearly(DataKunjungan *head, int year){
     int income = 0;
     while(curr != NULL){
         if(curr->tanggal.year == year){
-            income += tindakan[curr->tindakan].biaya + 140000 //biaya pemeriksaan dan pendaftaran;
+            income += tindakan[curr->tindakan].biaya + 140000 ;//biaya pemeriksaan dan pendaftaran;
         }
         curr = curr->next;
     }
@@ -79,7 +82,7 @@ int* get_unique_years(DataKunjungan* head, int* count) {
 }
 
 // function to get average income per year
-int average_income_per_year(DataKunjungan* head) {
+float average_income_per_year(DataKunjungan* head) {
     int count;
     int* years = get_unique_years(head, &count);
 
@@ -90,5 +93,43 @@ int average_income_per_year(DataKunjungan* head) {
 
     free(years);
 
-    return total_income / count;
+    return total_income / count*1.0;
+}
+
+void cashflow(DataKunjungan *head){
+    setlocale(LC_NUMERIC, "");
+    int month, year;
+
+    //selector
+    int choice;
+    printf("Pilih menu:\n");
+    printf("1. Pendapatan bulanan\n");
+    printf("2. Pendapatan tahunan\n");
+    printf("3. Rata-rata pendapatan per tahun\n");
+    printf("Pilihan: ");
+    scanf("%d", &choice);
+
+    switch case(choice){
+        case 1:
+            printf("Masukkan bulan dan tahun (MM YYYY): ");
+            scanf("%d %d", &month, &year);
+
+            printf("Pendapatan %d/%d : Rp. %'d\n", month, year, income_monthly(head, month, year));
+            break;
+        case 2:
+            printf("Masukkan tahun (YYYY): ");
+            scanf("%d", &year);
+            printf("Pendapatan %d : Rp. %d'\n",year, income_yearly(head, year));
+            break;
+        case 3:
+            printf("Pendapatan rata-rata per tahun: Rp. %'.2f\n", average_income_per_year(head));
+            break;
+    }
+}
+
+int main(){
+    DataKunjungan *head = NULL;
+    readDataKunjungan(&head); // placholder
+    cashflow(head);
+    return 0;
 }
