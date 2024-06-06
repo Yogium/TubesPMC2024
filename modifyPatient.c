@@ -1,4 +1,6 @@
-//Nicholas Darren
+//Nama : Nicholas Darren
+//Nama file : modifyPatient.c
+// Deskripsi : Fungsi ini untuk mengubah data pasien dengan input ID dari user
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
