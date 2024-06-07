@@ -1,3 +1,6 @@
+//Nama : Nicholas Darren
+//Nama file : parsingDate.c
+// Deskripsi : Fungsi ini menerima tanggal yang belom di format menjadi tanggal yang memiliki format yang sama yaitu dd-mm-yyyy
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
