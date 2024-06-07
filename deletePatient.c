@@ -49,6 +49,6 @@ int main(){
     printf("Masukkan ID pasien yang ingin dihapus: ");
     fgets(idToModify, sizeof(idToModify), stdin);
     idToModify[strcspn(idToModify, "\n")] = 0;
-    deletePatient(patientHead, idToModify);
+    deletePatient(&patientHead, idToModify);
     return 0;
 }
