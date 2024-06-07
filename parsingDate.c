@@ -2,105 +2,160 @@
 #include <stdlib.h>
 #include <string.h>
 #include <ctype.h>
+#include "struct.h"
 
-typedef struct {
-    int day;
-    int month;
-    int year;
-    char original[20];
-} Date;
-
-// Function to get the month number from the month name or abbreviation
-int getMonthNumber(char* monthName) {
-    char* bulan[] = { // Char nama bulan
+int getMonthNumber(char* monthName) { //Fungsi untuk ambil nama bulan lalu jadi int
+    char* bulan[] = {
         "Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"
     };
-    char* bulanSingkat[] = { // Char nama bulan singkatan
+    char* bulanSingkat[] = {
         "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"
     };
-    
-    for (int i = 0; i < 12; i++) { //Iterasi
-        if (strcasecmp(monthName, bulan[i]) == 0 || strcasecmp(monthName, bulanSingkat[i]) == 0) { //Cek apabila inputnya sesuai sama nama bulan ato nama bulanSingkat
+
+    for (int i = 0; i < 12; i++) { //Jadinya Januari 1, Februari 2, ...
+        if (strcasecmp(monthName, bulan[i]) == 0 || strcasecmp(monthName, bulanSingkat[i]) == 0) {
             return i + 1;
         }
     }
-    return -1;
+    return 0;
 }
 
-
-Date parseDate(char* dateString) {
-    Date date;
+date parseDate(char* dateString, char* original) { //Fungsi utama buat parsing tanggal
+    date parsedDate;
     char monthName[20];
 
-    if (sscanf(dateString, "%d %s %d", &date.day, monthName, &date.year) == 3) { //Tanggal dalam dd mm yyyy
-        date.month = getMonthNumber(monthName); //Panggil fungsi getMonthNumber
-        if (date.month == -1) { //Kalo nama bulan ga ketemu (Invalid)
-            fprintf(stderr, "Nama bulan Invalid: %s\n", monthName);
+    if (sscanf(dateString, "%d %s %d", &parsedDate.date, monthName, &parsedDate.year) == 3) { //Parse tanggal yang Formatnya DD MMMM YY
+        parsedDate.month = getMonthNumber(monthName);
+        if (parsedDate.month == 0) { // Kalo nomor bulan invalid, print error
+            fprintf(stderr, "Invalid month name: %s\n", monthName);
             exit(EXIT_FAILURE);
         }
-        sprintf(date.original, "%02d-%02d-%04d", date.day, date.month, date.year);
-
-    } else if (sscanf(dateString, "%d-%3s-%2d", &date.day, monthName, &date.year) == 3) { //Buat tanggal yang dalam format dd-mmm-yy
-        date.month = getMonthNumber(monthName); //Panggil fungsi getMonthNumber
-        if (date.month == -1) { //Kalo nama bulan ga ketemu (invalid)
-            fprintf(stderr, "Nama bulan singkatannya Invalid: %s\n", monthName);
+        sprintf(original, "%02d-%02d-%04d", parsedDate.date, parsedDate.month, parsedDate.year); //Format tanggal jadi DD-MM-YYYY
+    } 
+    else if (sscanf(dateString, "%d-%3s-%2d", &parsedDate.date, monthName, &parsedDate.year) == 3) {//Parse tanggal yang Formatnya DD-Mmm-YY
+        parsedDate.month = getMonthNumber(monthName);
+        if (parsedDate.month == 0) { // Kalo nomor bulan invalid, print error
+            fprintf(stderr, "Invalid month name: %s\n", monthName);
             exit(EXIT_FAILURE);
         }
 
-        if (date.year < 100) { //Case kalo yang tahunnya <100
-            date.year += 1900; //Jadi ditambah 1900 biar format sama
+        if (parsedDate.year < 100) { //Kalo tahun < 100 maka ditambah 1900 ato 2000 tergantung.
+            parsedDate.year += (parsedDate.year >= 50) ? 1900 : 2000; //Ini pake ASUMSI kalo tahunnya 50<= YYYY < 100 bakal nambah 1900. Dan kalo YYYY<50 bakal nambah 2000
         }
-        sprintf(date.original, "%02d-%02d-%04d", date.day, date.month, date.year);
-
-    } else { //Format diluar tadi, berarti invalid
+        sprintf(original, "%02d-%02d-%04d", parsedDate.date, parsedDate.month, parsedDate.year);
+    } 
+    else { //Diluar format tersebut invalid
         fprintf(stderr, "Invalid date format: %s\n", dateString);
         exit(EXIT_FAILURE);
     }
     
-    return date;
+    return parsedDate;
+}
+
+int parseDataFromFile(const char* filename, date** dates, char*** originals, int* dateCount, int* capacity) { //Fungsi buat parse data dari CSV dan simpen tanggal
+    FILE* file = fopen(filename, "r");
+    if (!file) {
+        perror("Failed to open file");
+        return 0;
+    }
+    char line[256];
+    //Alokasi memori buat string dates & orignials
+    *dates = malloc(*capacity * sizeof(date));
+    *originals = malloc(*capacity * sizeof(char*));
+    if (!*dates || !*originals) {
+        perror("Failed to allocate memory");
+        fclose(file);
+        return 0;
+    }
+
+    // Skip header
+    if (fgets(line, sizeof(line), file)) {
+        while (fgets(line, sizeof(line), file)) { // Read setiap line
+            line[strcspn(line, "\n")] = '\0';
+
+            // CSV dipisah dengan koma
+            char* token = strtok(line, ",");
+            int colomnCount = 0;
+            char* dateString = NULL;
+
+            while (token) {
+                colomnCount++;
+                if (filename == "Data_Pasien.csv" && colomnCount == 6) { //Kalau input dari Data_Pasien.csv
+                    dateString = token; // Tanggal ada di kolom 6 in Data_Pasien.csv
+                    break;
+                } else if (filename == "Riwayat_Datang.csv" && colomnCount == 2) { //Kalau input dari Riwayat_Datang.csv
+                    dateString = token; // Tanggal ada di kolom 2 Riwayat_Datang.csv
+                    break;
+                }
+                token = strtok(NULL, ","); //Pindah ke token selanjutnya
+            }
+
+            if (dateString && *dateCount < *capacity) { // Kalo dateCount masih dalam kapasitas
+                (*originals)[*dateCount] = malloc(20 * sizeof(char)); //Alokasi memori untuk string originals
+                if (!(*originals)[*dateCount]) { //Cek alokasi memori
+                    perror("Failed to allocate memory");
+                    fclose(file);
+                    return 0;
+                }
+                (*dates)[*dateCount] = parseDate(dateString, (*originals)[*dateCount]); //Simpan tanggal parsed di array dates
+                (*dateCount)++;
+            } else if (*dateCount >= *capacity) { //Kalo dateCount lebih dari kapasitas
+                *capacity *= 2;
+                *dates = realloc(*dates, *capacity * sizeof(date)); //Alokasi memori lagi
+                *originals = realloc(*originals, *capacity * sizeof(char*));
+                if (!*dates || !*originals) {
+                    perror("Failed to reallocate memory");
+                    fclose(file);
+                    return 0;
+                }
+            }
+        }
+    }
+    fclose(file);
+    return 1;
 }
 
 int main() {
-    FILE* file = fopen("dates.txt", "r"); //INI INPUTNYA MASIH TXT
-    if (!file) {
-        perror("Failed to open file");
+    int capacity_pasien = 10;
+    int capacity_riwayat = 10;
+    int dateCount_pasien = 0;
+    int dateCount_riwayat = 0;
+    date* dates_pasien = NULL;
+    date* dates_riwayat = NULL;
+    char** originals_pasien = NULL;
+    char** originals_riwayat = NULL;
+
+    if (!parseDataFromFile("Data_Pasien.csv", &dates_pasien, &originals_pasien, &dateCount_pasien, &capacity_pasien)) {
+        fprintf(stderr, "Failed to parse data from Data_Pasien.csv\n");
         return EXIT_FAILURE;
     }
 
-    char line[256];
-    Date* dates = NULL;
-    int dateCount = 0;
-    int capacity = 10;
+    printf("Dates from Data_Pasien.csv in dd-mm-yyyy format:\n");
+    for (int i = 0; i < dateCount_pasien; i++) {
+        printf("%s\n", originals_pasien[i]);
+    }
 
-    dates = malloc(capacity * sizeof(Date));
-    if (!dates) {
-        perror("Failed to allocate memory");
+    if (!parseDataFromFile("Riwayat_Datang.csv", &dates_riwayat, &originals_riwayat, &dateCount_riwayat, &capacity_riwayat)) {
+        fprintf(stderr, "Failed to parse data from Riwayat_Datang.csv\n");
         return EXIT_FAILURE;
     }
 
-    while (fgets(line, sizeof(line), file)) {
-        line[strcspn(line, "\n")] = '\0';
-        if (dateCount >= capacity) {
-            capacity *= 2;
-            dates = realloc(dates, capacity * sizeof(Date));
-            if (!dates) {
-                perror("Failed to reallocate memory");
-                return EXIT_FAILURE;
-            }
-        }
-
-        Date date = parseDate(line);
-        dates[dateCount++] = date;
-    }
-    fclose(file);
-
-    printf("Dates in dd-mm-yyyy format:\n"); // PRINT
-    for (int i = 0; i < dateCount; i++) {
-        printf("%s\n", dates[i].original);
+    printf("\nDates from Riwayat_Datang.csv in dd-mm-yyyy format:\n");
+    for (int i = 0; i < dateCount_riwayat; i++) {
+        printf("%s\n", originals_riwayat[i]);
     }
 
-    free(dates);
+    //Free memori
+    for (int i = 0; i < dateCount_pasien; i++) {
+        free(originals_pasien[i]);
+    }
+    for (int i = 0; i < dateCount_riwayat; i++) {
+        free(originals_riwayat[i]);
+    }
+    free(originals_pasien);
+    free(originals_riwayat);
+    free(dates_pasien);
+    free(dates_riwayat);
 
     return 0;
 }
-

@@ -17,13 +17,15 @@ extern char penyakit[4][20] = {"Dehidrasi", "Keseleo", "Masuk Angin", "Pusing"};
 
 extern Tindakan tindakan[6] = {{"Pendaftaran", 15000}, {"Pemeriksaan", 125000}, {"Vaksinasi", 100000}, {"Cek gula darah", 25000}, {"Pemasangan infus", 125000}, {"Pengobatan", 150000}};
 
-
+//struct untuk tanggal
 typedef struct{
     int date;
     int month;
     int year;
+    char original[20];
 }date;
 
+//struct untuk data pasien
 typedef struct DataP{
     int index;
     char nama[100];
@@ -37,6 +39,7 @@ typedef struct DataP{
     struct DataP *next;
 }DataPasien;
 
+//struct untuk data kunjungan
 typedef struct DataK{
     int index;
     date tanggal;
