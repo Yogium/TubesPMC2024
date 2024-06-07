@@ -8,78 +8,79 @@
 #include "struct.h"
 #include "parsingDate.c"
 
-void modifyPatient(DataPasien* head, char *patientID) { //Fungsi buat ubah data pasien
-    DataPasien* temp = head;
-    while (temp != NULL) { //Cari pasien dengan ID yang sudah dimasukkan pengguna
+void modifyPatient(DataPasien** head, char *patientID) {
+    DataPasien* temp = *head;
+    while (temp != NULL) {
         if (strcmp(temp->patientID, patientID) == 0) {
             char choice;
             char input[256];
-            
-            printf("Ubah fungsi:\n"); 
-            printf("1. Nama Lengkap\n");
-            printf("2. Alamat\n");
-            printf("3. Kota\n");
-            printf("4. Tempat Lahir\n");
-            printf("5. Tanggal Lahir\n");
-            printf("6. Umur\n");
-            printf("7. No BPJS\n");
-            printf("8. Exit\n");
-            printf("Masukkan angka: ");
-            scanf(" %c", &choice);
-            getchar();
 
-            switch (choice) { //Dibikin menu aja
-                case '1':
-                    printf("Masukkan nama baru: ");
-                    fgets(input, sizeof(input), stdin);
-                    input[strcspn(input, "\n")] = 0;
-                    strcpy(temp->nama, input);
-                    break;
-                case '2':
-                    printf("Masukkan alamat baru: ");
-                    fgets(input, sizeof(input), stdin);
-                    input[strcspn(input, "\n")] = 0;
-                    strcpy(temp->alamat, input);
-                    break;
-                case '3':
-                    printf("Masukkan kota baru: ");
-                    fgets(input, sizeof(input), stdin);
-                    input[strcspn(input, "\n")] = 0;
-                    strcpy(temp->kota, input);
-                    break;
-                case '4':
-                    printf("Masukkan tempat lahir baru: ");
-                    fgets(input, sizeof(input), stdin);
-                    input[strcspn(input, "\n")] = 0;
-                    strcpy(temp->tempatLahir, input);
-                    break;
-                case '5':
-                    printf("Masukkan tanggal lahir baru (format: dd mm yyyy or dd-mm-yy): ");
-                    fgets(input, sizeof(input), stdin);
-                    input[strcspn(input, "\n")] = 0;
-                    char original[20];
-                    temp->tgllahir = parseDate(input, original);
-                    break;
-                case '6':
-                    printf("Masukkan umur baru: ");
-                    fgets(input, sizeof(input), stdin);
-                    input[strcspn(input, "\n")] = 0;
-                    temp->umur = atoi(input);
-                    break;
-                case '7':
-                    printf("Masukkan no BPJS baru: ");
-                    fgets(input, sizeof(input), stdin);
-                    input[strcspn(input, "\n")] = 0;
-                    strcpy(temp->BPJS, input);
-                    break;
-                case '8': //Exit
-                    printf("Keluar.\n");
-                    return;
-                default: //Pilihan diluar 1 sampai 8 invalid
-                    printf("Invalid.\n");
-                    break;
+            while (1) { //Loop sampai user press exit
+                printf("Ubah fungsi:\n");
+                printf("1. Nama Lengkap\n");
+                printf("2. Alamat\n");
+                printf("3. Kota\n");
+                printf("4. Tempat Lahir\n");
+                printf("5. Tanggal Lahir\n");
+                printf("6. Umur\n");
+                printf("7. No BPJS\n");
+                printf("8. Exit\n");
+                printf("Masukkan angka: ");
+                scanf(" %c", &choice);
+                getchar();
+
+                switch (choice) { //Dibikin menu dengan switch case
+                    case '1':
+                        printf("Masukkan nama baru: ");
+                        scanf(" %[^\n]", input);
+                        strcpy(temp->nama, input);
+                        printf("Nama berhasil diganti\n");
+                        break;
+                    case '2':
+                        printf("Masukkan alamat baru: ");
+                        scanf(" %[^\n]", input);
+                        strcpy(temp->alamat, input);
+                        printf("Alamat berhasil diganti\n");
+                        break;
+                    case '3':
+                        printf("Masukkan kota baru: ");
+                        scanf(" %[^\n]", input);
+                        strcpy(temp->kota, input);
+                        printf("Kota berhasil diganti\n");
+                        break;
+                    case '4':
+                        printf("Masukkan tempat lahir baru: ");
+                        scanf(" %[^\n]", input);
+                        strcpy(temp->tempatLahir, input);
+                        printf("Tempat lahir berhasil diganti\n");
+                        break;
+                    case '5':
+                        printf("Masukkan tanggal lahir baru (format: dd mm yyyy or dd-mm-yy): ");
+                        scanf(" %[^\n]", input);
+                        char original[20];
+                        temp->tgllahir = parseDate(input, original);
+                        printf("Tanggal lahir berhasil diganti\n");
+                        break;
+                    case '6':
+                        printf("Masukkan umur baru: ");
+                        scanf(" %[^\n]", input);
+                        temp->umur = atoi(input);
+                        printf("Umur berhasil diganti\n");
+                        break;
+                    case '7':
+                        printf("Masukkan no BPJS baru: ");
+                        scanf(" %[^\n]", input);
+                        strcpy(temp->BPJS, input);
+                        printf("No BPJS berhasil diganti\n");
+                        break;
+                    case '8': //exit program
+                        printf("Keluar.\n");
+                        return;
+                    default: //Diluar 1-8 invalid
+                        printf("Invalid.\n");
+                        break;
+                }
             }
-            return;
         }
         temp = temp->next;
     }
@@ -87,11 +88,11 @@ void modifyPatient(DataPasien* head, char *patientID) { //Fungsi buat ubah data 
 }
 
 int main(){
-    DataPasien* patientHead = NULL;
+    DataPasien* pasienHead = NULL;
     char idToModify[20];
     printf("Masukkan ID pasien yang ingin diubah: ");
     fgets(idToModify, sizeof(idToModify), stdin);
     idToModify[strcspn(idToModify, "\n")] = 0;
-    modifyPatient(patientHead, idToModify);
+    modifyPatient(&pasienHead, idToModify);
     return 0;
 }
