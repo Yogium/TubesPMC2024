@@ -50,4 +50,26 @@ typedef struct DataK{
     struct DataK *next;
 }DataKunjungan;
 
+//Convert diagnosis to integer index from array penyakit
+//input: penyakit(array of penyakit in struct.h) diagnosis(diagnosis to be converted)
+int getDiagnosis(char penyakit[4][20], char *diagnosis){
+    for(int i = 0; i < 4; i++){
+        if(strcmp(penyakit[i], diagnosis) == 0){
+            return i;
+        }
+    }
+    return -1;
+}
+
+//Convert tindakan to integer index from array tindakan
+//input: tindakan(array of tindakan in struct.h) action(tindakan to be converted)
+int getTindakan(Tindakan tindakan[6], char *action){
+    for(int i = 0; i < 6; i++){
+        if(strcmp(tindakan[i].nama, action) == 0){
+            return i;
+        }
+    }
+    return -1;
+}
+
 #endif
