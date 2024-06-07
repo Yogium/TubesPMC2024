@@ -2,234 +2,156 @@
 #include <stdlib.h>
 #include <string.h>
 #include <ctype.h>
+#include "struct.h"
+#include "parsingDate.c"
 
-// Definisi struct untuk tanggal
-typedef struct {
-    int day;
-    int month;
-    int year;
-    char original[20];
-} Date;
-
-// Definisi struct untuk data pasien
-typedef struct Patient {
-    int id;
-    char name[100];
-    char address[100];
-    char city[50];
-    char birthplace[50];
-    Date birthdate;
-    int age;
-    char bpjs[20];
-    struct Patient* next;
-} Patient;
-
-// Definisi struct untuk riwayat kedatangan
-typedef struct Visit {
-    Date visitDate;
-    int patientId;
-    char diagnosis[100];
-    char action[100];
-    char control[50];
-    float cost;
-    struct Visit* next;
-} Visit;
-
-// Fungsi untuk mendapatkan nomor bulan dari nama bulan
-int getMonthNumber(char* monthName) {
-    char* bulan[] = { "Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember" };
-    char* bulanSingkat[] = { "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec" };
-
-    for (int i = 0; i < 12; i++) {
-        if (strcasecmp(monthName, bulan[i]) == 0 || strcasecmp(monthName, bulanSingkat[i]) == 0) {
-            return i + 1;
+//fungsi untuk mencari index penyakit
+int findDisease(char* disease){
+    for(int i = 0; i < 4; i++){
+        if(strcmp(disease, penyakit[i]) == 0){
+            return i;
         }
     }
     return -1;
 }
 
-// Fungsi untuk parsing tanggal dari string (pertama)
-Date parseDate(char* dateString) {
-    Date date;
-    char monthName[20];
-
-    if (sscanf(dateString, "%d %s %d", &date.day, monthName, &date.year) == 3) {
-        date.month = getMonthNumber(monthName);
-        if (date.month == -1) {
-            fprintf(stderr, "Nama bulan Invalid: %s\n", monthName);
-            exit(EXIT_FAILURE);
+//fungsi untuk mencari index tindakan
+int findAction(char* action){
+    for(int i = 0; i < 6; i++){
+        if(strcmp(action, tindakan[i].nama) == 0){
+            return i;
         }
-        sprintf(date.original, "%02d-%02d-%04d", date.day, date.month, date.year);
-    } else if (sscanf(dateString, "%d-%3s-%2d", &date.day, monthName, &date.year) == 3) {
-        date.month = getMonthNumber(monthName);
-        if (date.month == -1) {
-            fprintf(stderr, "Nama bulan singkatannya Invalid: %s\n", monthName);
-            exit(EXIT_FAILURE);
-        }
-        if (date.year < 100) {
-            date.year += 1900;
-        }
-        sprintf(date.original, "%02d-%02d-%04d", date.day, date.month, date.year);
-    } else {
-        fprintf(stderr, "Invalid date format: %s\n", dateString);
-        exit(EXIT_FAILURE);
     }
-    
-    return date;
+    return -1;
 }
 
-// Fungsi untuk parsing tanggal dari string (kedua, untuk visit)
-Date parseDateVisit(char* dateString) {
-    Date date;
-    char monthName[20];
 
-    if (sscanf(dateString, "%d %s %d", &date.day, monthName, &date.year) == 3) {
-        date.month = getMonthNumber(monthName);
-        if (date.month == -1) {
-            fprintf(stderr, "Nama bulan Invalid: %s\n", monthName);
-            exit(EXIT_FAILURE);
-        }
-        sprintf(date.original, "%02d-%02d-%04d", date.day, date.month, date.year);
-    } else if (sscanf(dateString, "%d-%3s-%2d", &date.day, monthName, &date.year) == 3) {
-        date.month = getMonthNumber(monthName);
-        if (date.month == -1) {
-            fprintf(stderr, "Nama bulan singkatannya Invalid: %s\n", monthName);
-            exit(EXIT_FAILURE);
-        }
-        if (date.year < 100) {
-            date.year += 2000;
-        }
-        sprintf(date.original, "%02d-%02d-%04d", date.day, date.month, date.year);
-    } else {
-        fprintf(stderr, "Invalid date format: %s\n", dateString);
-        exit(EXIT_FAILURE);
-    }
-    
-    return date;
+// fungsi untuk membuat node baru untuk pasien
+DataPasien* createpatient(int index, char* name, char* address, char* city, char* birthplace, date birthdate, int age, char* bpjs, char* patientID) {
+    DataPasien* newpatient = (DataPasien*)malloc(sizeof(DataPasien));
+    newpatient->index = index;
+    strcpy(newpatient->nama, name);
+    strcpy(newpatient->alamat, address);
+    strcpy(newpatient->kota, city);
+    strcpy(newpatient->tempatLahir, birthplace);
+    newpatient->tgllahir = birthdate;
+    newpatient->umur = age;
+    strcpy(newpatient->BPJS, bpjs);
+    newpatient->next = NULL;
+    return newpatient;
 }
 
-// Fungsi untuk membuat node baru untuk pasien
-Patient* createPatient(int id, char* name, char* address, char* city, char* birthplace, Date birthdate, int age, char* bpjs) {
-    Patient* newPatient = (Patient*)malloc(sizeof(Patient));
-    newPatient->id = id;
-    strcpy(newPatient->name, name);
-    strcpy(newPatient->address, address);
-    strcpy(newPatient->city, city);
-    strcpy(newPatient->birthplace, birthplace);
-    newPatient->birthdate = birthdate;
-    newPatient->age = age;
-    strcpy(newPatient->bpjs, bpjs);
-    newPatient->next = NULL;
-    return newPatient;
+// fungsi untuk membuat node baru untuk riwayat kedatangan
+DataKunjungan* createvisit(int index, date visitdate, char* patientid, char* diagnosis, char* action, date control) {
+    DataKunjungan* newvisit = (DataKunjungan*)malloc(sizeof(DataKunjungan));
+    newvisit->tanggal = visitdate;
+    strcpy(newvisit->patientID, patientid);
+    newvisit->diagnosis = findDisease(diagnosis);
+    newvisit->tindakan = findAction(action);
+    newvisit->control = control;
+    newvisit->next = NULL;
+    return newvisit;
 }
 
-// Fungsi untuk membuat node baru untuk riwayat kedatangan
-Visit* createVisit(Date visitDate, int patientId, char* diagnosis, char* action, char* control, float cost) {
-    Visit* newVisit = (Visit*)malloc(sizeof(Visit));
-    newVisit->visitDate = visitDate;
-    newVisit->patientId = patientId;
-    strcpy(newVisit->diagnosis, diagnosis);
-    strcpy(newVisit->action, action);
-    strcpy(newVisit->control, control);
-    newVisit->cost = cost;
-    newVisit->next = NULL;
-    return newVisit;
-}
-
-// Fungsi untuk menambah node di akhir linked list pasien
-void appendPatient(Patient** head, int id, char* name, char* address, char* city, char* birthplace, Date birthdate, int age, char* bpjs) {
-    Patient* newPatient = createPatient(id, name, address, city, birthplace, birthdate, age, bpjs);
+// fungsi untuk menambah node di akhir linked list pasien
+void appendpatient(DataPasien** head, int index, char* name, char* address, char* city, char* birthplace, date birthdate, int age, char* bpjs, char* patientID) {
+    DataPasien* newpatient = createpatient(index, name, address, city, birthplace, birthdate, age, bpjs, patientID);
     if (*head == NULL) {
-        *head = newPatient;
+        *head = newpatient;
     } else {
-        Patient* temp = *head;
+        DataPasien* temp = *head;
         while (temp->next != NULL) {
             temp = temp->next;
         }
-        temp->next = newPatient;
+        temp->next = newpatient;
     }
 }
 
-// Fungsi untuk menambah node di akhir linked list riwayat kedatangan
-void appendVisit(Visit** head, Date visitDate, int patientId, char* diagnosis, char* action, char* control, float cost) {
-    Visit* newVisit = createVisit(visitDate, patientId, diagnosis, action, control, cost);
+// fungsi untuk menambah node di akhir linked list riwayat kedatangan
+void appendvisit(DataKunjungan** head, int index, date visitdate, char* patientid, char* diagnosis, char* action, date control) {
+    DataKunjungan* newvisit = createvisit(index, visitdate, patientid, diagnosis, action, control);
     if (*head == NULL) {
-        *head = newVisit;
+        *head = newvisit;
     } else {
-        Visit* temp = *head;
+        DataKunjungan* temp = *head;
         while (temp->next != NULL) {
             temp = temp->next;
         }
-        temp->next = newVisit;
+        temp->next = newvisit;
     }
 }
 
-// Fungsi untuk mencetak linked list pasien
-void printPatients(Patient* head) {
-    Patient* temp = head;
+// fungsi untuk mencetak linked list pasien
+void printpatients(DataPasien* head) {
+    DataPasien* temp = head;
     while (temp != NULL) {
-        printf("ID: %d, Name: %s, Address: %s, City: %s, Birthplace: %s, Birthdate: %s, Age: %d, BPJS: %s\n", 
-               temp->id, temp->name, temp->address, temp->city, temp->birthplace, temp->birthdate.original, temp->age, temp->bpjs);
+        printf("name: %s, address: %s, city: %s, birthplace: %s, birthdate: %s, age: %d, bpjs: %s\n", 
+            temp->nama, temp->alamat, temp->kota, temp->tempatLahir, temp->tgllahir.original, temp->umur, temp->BPJS);
         temp = temp->next;
     }
 }
 
-// Fungsi untuk mencetak linked list riwayat kedatangan
-void printVisits(Visit* head) {
-    Visit* temp = head;
+// fungsi untuk mencetak linked list riwayat kedatangan
+void printvisits(DataKunjungan* head) {
+    DataKunjungan* temp = head;
     while (temp != NULL) {
-        printf("Visit Date: %s, Patient ID: %d, Diagnosis: %s, Action: %s, Control: %s, Cost: %.2f\n", 
-               temp->visitDate.original, temp->patientId, temp->diagnosis, temp->action, temp->control, temp->cost);
+        printf("visit date: %s, patient id: %s, diagnosis: %s, action: %s, control: %s\n", 
+               temp->tanggal.original, temp->patientID, penyakit[temp->diagnosis], tindakan[temp->tindakan].nama, temp->control.original);
         temp = temp->next;
     }
+}
+
+void init_LL(DataPasien** patientHead, DataKunjungan** kunjunganHead ){
+    *patientHead = NULL;
+    *kunjunganHead = NULL;
+    FILE* flPasien = fopen("Data_Pasien.csv", "r");
+    FILE* flKunjungan = fopen("Riwayat_Datang.csv", "r");
+    if(flPasien == NULL){
+        printf("Error opening patient data\n");
+        return;
+    }
+    if(flKunjungan == NULL){
+        printf("Error opening visit data\n");
+        return;
+    }
+    char originalBirthDate[20][100];
+    char line[256];
+     while (fgets(line, sizeof(line), flPasien)) {
+        if (strstr(line, "visits:") != NULL) {
+            break;
+        }
+
+        int id, age;
+        char name[100], address[100], city[50], birthplace[50], birthdatestr[20], bpjs[20], patID[11];
+        sscanf(line, "%d,%99[^,],%99[^,],%49[^,],%49[^,],%19[^,],%d,%19[^,],%11[^,,]", &id, name, address, city, birthplace, birthdatestr, &age, bpjs, patID);
+        date birthdate = parseDate(birthdatestr, originalBirthDate);
+        appendpatient(&patientHead, id, name, address, city, birthplace, birthdate, age, bpjs, patID);
+    }
+
+    // membaca riwayat kedatangan
+    while (fgets(line, sizeof(line), flKunjungan)) {
+        char visitdatestr[20], diagnosis[100], action[100], controlstr[50], patientid[11];
+        int index;
+        float cost;
+        char originalVisit[20][100], originalControl[20][100];
+        sscanf(line, "%d,%19[^,],%11[^,],%99[^,],%99[^,],%49[^,]", &index, visitdatestr, patientid, diagnosis, action, controlstr);
+        date visitdate = parseDate(visitdatestr, originalVisit);
+        date control = parseDate(controlstr, originalControl);
+        appendvisit(kunjunganHead, index, visitdate, patientid, diagnosis, action, control);
+    }   
+    fclose(flPasien);
+    fclose(flKunjungan);
 }
 
 int main() {
-    FILE* file = fopen("/mnt/data/DataPMC20232024.txt", "r");
-    if (file == NULL) {
-        fprintf(stderr, "Error opening file\n");
-        return EXIT_FAILURE;
-    }
+    DataPasien* patienthead;
+    DataKunjungan* visithead;
+    init_LL(&patienthead, &visithead);
+    printf("patients:\n");
+    printpatients(patienthead);
 
-    char line[256];
-    Patient* patientHead = NULL;
-    Visit* visitHead = NULL;
-
-    // Membaca data pasien
-    while (fgets(line, sizeof(line), file)) {
-        if (strstr(line, "Patients:") != NULL) {
-            break;
-        }
-    }
-    
-    while (fgets(line, sizeof(line), file)) {
-        if (strstr(line, "Visits:") != NULL) {
-            break;
-        }
-        int id, age;
-        char name[100], address[100], city[50], birthplace[50], birthdateStr[20], bpjs[20];
-        sscanf(line, "%d,%99[^,],%99[^,],%49[^,],%49[^,],%19[^,],%d,%19[^,]", &id, name, address, city, birthplace, birthdateStr, &age, bpjs);
-        Date birthdate = parseDate(birthdateStr);
-        appendPatient(&patientHead, id, name, address, city, birthplace, birthdate, age, bpjs);
-    }
-
-    // Membaca riwayat kedatangan
-    while (fgets(line, sizeof(line), file)) {
-        char visitDateStr[20], diagnosis[100], action[100], control[50];
-        int patientId;
-        float cost;
-        sscanf(line, "%19[^,],%d,%99[^,],%99[^,],%49[^,],%f", visitDateStr, &patientId, diagnosis, action, control, &cost);
-        Date visitDate = parseDateVisit(visitDateStr);
-        appendVisit(&visitHead, visitDate, patientId, diagnosis, action, control, cost);
-    }
-
-    fclose(file);
-
-    printf("Patients:\n");
-    printPatients(patientHead);
-
-    printf("\nVisits:\n");
-    printVisits(visitHead);
+    printf("\nvisits:\n");
+    printvisits(visithead);
 
     return 0;
 }
