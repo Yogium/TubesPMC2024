@@ -8,14 +8,19 @@
 #include "struct.h"
 #include "parsingDate.c"
 
-void modifyPatient(DataPasien** head, char *patientID) {
+void modifyPatient(DataPasien** head) {
+    char idToModify[20];
+    printf("Masukkan ID pasien yang ingin diubah: ");
+    fgets(idToModify, sizeof(idToModify), stdin);
+    idToModify[strcspn(idToModify, "\n")] = 0;
     DataPasien* temp = *head;
+    
     while (temp != NULL) {
-        if (strcmp(temp->patientID, patientID) == 0) {
-            char choice;
+        if (strcmp(temp->patientID, idToModify) == 0) {
+            int choice;
             char input[256];
 
-            while (1) { //Loop sampai user press exit
+            while (1) { // Loop sampai user press exit
                 printf("Ubah fungsi:\n");
                 printf("1. Nama Lengkap\n");
                 printf("2. Alamat\n");
@@ -26,10 +31,10 @@ void modifyPatient(DataPasien** head, char *patientID) {
                 printf("7. No BPJS\n");
                 printf("8. Exit\n");
                 printf("Masukkan angka: ");
-                scanf(" %c", &choice);
+                scanf(" %d", &choice);
                 getchar();
 
-                switch (choice) { //Dibikin menu dengan switch case
+                switch (choice) { // Dibikin menu dengan switch case
                     case '1':
                         printf("Masukkan nama baru: ");
                         scanf(" %[^\n]", input);
@@ -73,10 +78,10 @@ void modifyPatient(DataPasien** head, char *patientID) {
                         strcpy(temp->BPJS, input);
                         printf("No BPJS berhasil diganti\n");
                         break;
-                    case '8': //exit program
+                    case '8':
                         printf("Keluar.\n");
                         return;
-                    default: //Diluar 1-8 invalid
+                    default:
                         printf("Invalid.\n");
                         break;
                 }
@@ -84,15 +89,12 @@ void modifyPatient(DataPasien** head, char *patientID) {
         }
         temp = temp->next;
     }
-    printf("Pasien dengan ID %s tidak ditemukan.\n", patientID);
+    printf("Pasien dengan ID %s tidak ditemukan.\n", idToModify);
 }
 
 int main(){
     DataPasien* pasienHead = NULL;
-    char idToModify[20];
-    printf("Masukkan ID pasien yang ingin diubah: ");
-    fgets(idToModify, sizeof(idToModify), stdin);
-    idToModify[strcspn(idToModify, "\n")] = 0;
-    modifyPatient(&pasienHead, idToModify);
+    modifyPatient(&pasienHead);
     return 0;
 }
+
