@@ -40,6 +40,7 @@ DataKunjungan* addVisit(DataKunjungan *head, DataKunjungan *newVisit){
     return head;
 }
 
+//Fungsi untuk mencari data kunjungan berdasarkan patientID
 DataKunjungan* searchVisit(DataKunjungan *head, char *patientID){
     DataKunjungan *temp = head;
     while(temp != NULL){
@@ -51,25 +52,7 @@ DataKunjungan* searchVisit(DataKunjungan *head, char *patientID){
     return NULL;
 }
 
-DataKunjungan* deleteVisit(DataKunjungan *head, char *patientID){
-    DataKunjungan *temp = head;
-    DataKunjungan *prev = NULL;
-    while(temp != NULL){
-        if(strcmp(temp->patientID, patientID) == 0){
-            if(prev == NULL){
-                head = temp->next;
-            }else{
-                prev->next = temp->next;
-            }
-            free(temp);
-            return head;
-        }
-        prev = temp;
-        temp = temp->next;
-    }
-    return head;
-}
-
+//Fungsi untuk mengubah data kunjungan berdasarkan patientID
 DataKunjungan* updateVisit(DataKunjungan *head, char *patientID, DataKunjungan *newVisit){
     DataKunjungan *temp = head;
     while(temp != NULL){
@@ -87,10 +70,10 @@ DataKunjungan* updateVisit(DataKunjungan *head, char *patientID, DataKunjungan *
     return head;
 }
 
+//Fungsi untuk menampilkan data kunjungan
 void printVisit(DataKunjungan *head){
     DataKunjungan *temp = head;
     while(temp != NULL){
-        printf("Index: %d\n", temp->index);
         printf("Tanggal: %d-%d-%d\n", temp->tanggal.date, temp->tanggal.month, temp->tanggal.year);
         printf("Patient ID: %s\n", temp->patientID);
         printf("Diagnosis: %s\n", penyakit[temp->diagnosis]);
@@ -99,3 +82,90 @@ void printVisit(DataKunjungan *head){
         temp = temp->next;
     }
 }
+
+int getIndex(DataKunjungan *head){
+    DataKunjungan *temp = head;
+    int index = 0;
+    while(temp != NULL){
+        index++;
+        temp = temp->next;
+    }
+    return index;
+}
+
+//Fungsi untuk mendapat untuk proses menambah data kunjungan
+void addVisitProcess(DataKunjungan **head){
+    int diagnosis, tindakan;
+    char patientID[11];
+    int index = getIndex(*head);
+    date tanggal, control;
+    printf("Masukkan tanggal kunjungan (dd-mm-yyyy): ");
+    scanf("%d-%d-%d", &tanggal.date, &tanggal.month, &tanggal.year);
+    printf("Masukkan patient ID: ");
+    scanf("%s", patientID);
+    printf("Masukkan diagnosis: ");
+    scanf("%d", &diagnosis);
+    printf("Masukkan tindakan: ");
+    scanf("%d", &tindakan);
+    printf("Masukkan tanggal control (dd-mm-yyyy): ");
+    scanf("%d-%d-%d", &control.date, &control.month, &control.year);
+    DataKunjungan *newVisit = createVisit(index, tanggal, patientID, diagnosis, tindakan, control);
+    *head = addVisit(*head, newVisit);
+}
+
+//Fungsi untuk mendapat untuk proses menghapus data kunjungan
+void deleteVisit(DataKunjungan **head){
+    char patientID[11];
+    printf("Masukkan patient ID: ");
+    scanf("%s", patientID);
+    DataKunjungan *temp = *head;
+    DataKunjungan *prev = NULL;
+    while(temp != NULL){
+        if(strcmp(temp->patientID, patientID) == 0){
+            if(prev == NULL){
+                *head = temp->next;
+                printf("Data kunjungan berhasil dihapus\n");
+            }else{
+                prev->next = temp->next;
+                printf("Data kunjungan berhasil dihapus\n");
+            }
+            free(temp);
+            return;
+        }
+        prev = temp;
+        temp = temp->next;
+    }
+}
+
+//Fungsi untuk mendapat untuk proses mengubah data kunjungan
+void changeVisit(DataKunjungan **head){
+    int diagnosis, tindakan;
+    char patientID[11];
+    date tanggal, control;
+    printf("Masukkan patient ID: ");
+    scanf("%s", patientID);
+    printf("Masukkan tanggal kunjungan (dd-mm-yyyy): ");
+    scanf("%d-%d-%d", &tanggal.date, &tanggal.month, &tanggal.year);
+    printf("Masukkan diagnosis: ");
+    scanf("%d", &diagnosis);
+    printf("Masukkan tindakan: ");
+    scanf("%d", &tindakan);
+    printf("Masukkan tanggal control (dd-mm-yyyy): ");
+    scanf("%d-%d-%d", &control.date, &control.month, &control.year);
+    DataKunjungan *newVisit = createVisit(getIndex(*head), tanggal, patientID, diagnosis, tindakan, control);
+    *head = updateVisit(*head, patientID, newVisit);
+}
+
+//Fungsi untuk mendapat untuk proses mencari data kunjungan
+void searchVisitProcess(DataKunjungan *head){
+    char patientID[11];
+    printf("Masukkan patient ID: ");
+    scanf("%s", patientID);
+    DataKunjungan *result = searchVisit(head, patientID);
+    if(result == NULL){
+        printf("Data kunjungan tidak ditemukan\n");
+    }else{
+        printVisit(result);
+    }
+}
+
