@@ -22,7 +22,6 @@ typedef struct{
     int date;
     int month;
     int year;
-    char original[20];
 }date;
 
 //struct untuk data pasien
