@@ -1,3 +1,4 @@
-addRiwayat.c
-deleteRiwayat.c
-editRiwayat.c
+*.a
+LL
+gui_test
+test
