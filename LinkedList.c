@@ -2,50 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <ctype.h>
-
-// Struktur untuk menyimpan tanggal
-typedef struct {
-    int date;
-    int month;
-    int year;
-} date;
-
-// Struktur untuk menyimpan data pasien
-typedef struct DataP {
-    int index;
-    char nama[100];
-    char alamat[100];
-    char kota[50];
-    char tempatLahir[50];
-    date tgllahir;
-    int umur;
-    char BPJS[11];
-    char patientID[11];
-    struct DataP *next;
-} DataPasien;
-
-// Struktur untuk menyimpan data kunjungan
-typedef struct DataK {
-    int index;
-    date tanggal;
-    char patientID[11];
-    int diagnosis;
-    int tindakan;
-    date control;
-    struct DataK *next;
-} DataKunjungan;
-
-// Daftar penyakit yang tersedia
-char penyakit[4][20] = {"Dehidrasi", "Keseleo", "Masuk Angin", "Pusing"};
-
-// Struktur untuk menyimpan jenis tindakan dan biayanya
-typedef struct {
-    char tindakan[20];
-    int biaya;
-} Tindakan;
-
-// Daftar tindakan yang tersedia
-Tindakan tindakan[6] = {{"Pendaftaran", 15000}, {"Pemeriksaan", 125000}, {"Vaksinasi", 100000}, {"Cek gula darah", 25000}, {"Pemasangan infus", 125000}, {"Pengobatan", 150000}};
+#include "struct.h"
 
 // Fungsi untuk mendapatkan nomor bulan dari nama bulan
 int getMonthNumber(char* monthName) {
@@ -269,7 +226,7 @@ void printDataKunjunganList(DataKunjungan* head) {
         printf("Tanggal: %02d-%02d-%04d\n", temp->tanggal.date, temp->tanggal.month, temp->tanggal.year);
         printf("Patient ID: %s\n", temp->patientID);
         printf("Diagnosis: %s\n", penyakit[temp->diagnosis]);
-        printf("Tindakan: %s (Rp %d)\n", tindakan[temp->tindakan].tindakan, tindakan[temp->tindakan].biaya);
+        printf("Tindakan: %s (Rp %d)\n", tindakan[temp->tindakan].nama, tindakan[temp->tindakan].biaya);
         printf("Control Date: %02d-%02d-%04d\n", temp->control.date, temp->control.month, temp->control.year);
         printf("\n");
         temp = temp->next;
@@ -286,3 +243,24 @@ void freeDataKunjunganList(DataKunjungan* head) {
     }
 }
 
+// Fungsi utama program
+int main() {
+    DataPasien* pasienHead = NULL;
+    DataKunjungan* kunjunganHead = NULL;
+
+    // Membaca data pasien dari file
+    parseDataPasienFromFile("Data_Pasien.csv", &pasienHead);
+    printf("Data Pasien List:\n");
+    printDataPasienList(pasienHead);
+
+    // Membaca data kunjungan dari file
+    parseDataKunjunganFromFile("Riwayat_Datang.csv", &kunjunganHead);
+    printf("Data Kunjungan List:\n");
+    printDataKunjunganList(kunjunganHead);
+
+    // Membebaskan memori dari linked list
+    freeDataPasienList(pasienHead);
+    freeDataKunjunganList(kunjunganHead);
+
+    return 0;
+}
