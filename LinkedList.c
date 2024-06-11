@@ -1,3 +1,7 @@
+// Nama        : Nusaiba El Qonitat
+// Nama file   : LinkedList.c
+// Deskripsi   : Fungsi untuk menginput informasi dalam file csv ke dalam linked list
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
