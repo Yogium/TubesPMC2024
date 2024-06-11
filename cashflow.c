@@ -129,6 +129,7 @@ void cashflow(DataKunjungan *head){
 
 
 // Fungsi utama program
+
 int main() {
     DataPasien* pasienHead = NULL;
     DataKunjungan* kunjunganHead = NULL;
