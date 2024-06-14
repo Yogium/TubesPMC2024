@@ -6,7 +6,7 @@
 #include <string.h>
 #include <ctype.h>
 #include "struct.h"
-#include "parsingDate.c"
+#include "parsingDate.h"
 
 void modifyPatient(DataPasien** head) {
     char idToModify[20];
@@ -92,9 +92,9 @@ void modifyPatient(DataPasien** head) {
     printf("Pasien dengan ID %s tidak ditemukan.\n", idToModify);
 }
 
-int main(){
-    DataPasien* pasienHead = NULL;
-    modifyPatient(&pasienHead);
-    return 0;
-}
+// int main(){
+//     DataPasien* pasienHead = NULL;
+//     modifyPatient(&pasienHead);
+//     return 0;
+// }
 

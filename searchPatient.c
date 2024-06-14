@@ -7,6 +7,8 @@
 #include <string.h>
 #include <ctype.h>
 #include "struct.h"
+#include "parsingDate.h"
+#include "LinkedList.h"
 
 void searchPatient(DataPasien* head) {
     int choice;
@@ -85,8 +87,8 @@ void searchPatient(DataPasien* head) {
     }
 }
 
-int main() {
-    DataPasien* pasienHead = NULL;
-    searchPatient(pasienHead);
-    return 0;
-}
+// int main() {
+//     DataPasien* pasienHead = NULL;
+//     searchPatient(pasienHead);
+//     return 0;
+// }
