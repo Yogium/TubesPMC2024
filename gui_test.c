@@ -26,16 +26,19 @@ int main(int argc, char *argv[]){
     GtkWidget *window;
     GtkWidget *button;
     GtkWidget *vbox;
+    GtkWidget *hbox;
     GtkWidget *button1;
     GtkWidget *entry;
+    GtkWidget *grid;
 
     gtk_init(&argc, &argv);
 
     window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
     gtk_window_set_title(GTK_WINDOW(window), "Click Me!");
     gtk_window_set_default_size(GTK_WINDOW(window), 500, 600);
-    vbox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 5);
-    
+    vbox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
+    hbox = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 0);
+    gtk_box_pack_start(GTK_BOX(vbox), hbox, TRUE, TRUE, 0);
     //button
     button = gtk_button_new_with_label("Add!");
     g_signal_connect(button, "clicked", G_CALLBACK(button_clicked), NULL);
@@ -51,14 +54,23 @@ int main(int argc, char *argv[]){
     entry = gtk_entry_new();
     g_signal_connect(entry, "activate", G_CALLBACK(get_text), entry);
 
+    //grid
+    grid = gtk_grid_new();
+    GtkWidget *label1 = gtk_label_new("Hello");
+    gtk_grid_attach(GTK_GRID(grid), label1, 0, 0, 1, 1);
+    GtkWidget *label2 = gtk_label_new("Label 2");
+    GtkWidget *entry1 = gtk_entry_new();
+    GtkWidget *entry2 = gtk_entry_new();
+
     //add button and label to vbox
-    gtk_box_pack_start(GTK_BOX(vbox), button, TRUE, TRUE, 0);
-    gtk_box_pack_start(GTK_BOX(vbox), button1, TRUE, TRUE, 0);
+    gtk_box_pack_start(GTK_BOX(hbox), button, TRUE, TRUE, 0);
+    gtk_box_pack_start(GTK_BOX(hbox), button1, TRUE, TRUE, 0);
     gtk_box_pack_start(GTK_BOX(vbox), entry, TRUE, TRUE, 100);
     gtk_box_pack_start(GTK_BOX(vbox), label, TRUE, TRUE, 0);
-
+    gtk_box_pack_start(GTK_BOX(vbox), grid, TRUE, TRUE, 0);
     //add vbox to window
     gtk_container_add(GTK_CONTAINER(window), vbox);
+    gtk_container_add(GTK_CONTAINER(window), hbox);
     g_signal_connect(window, "destroy", G_CALLBACK(gtk_main_quit), NULL);
     gtk_widget_show_all(window);
     gtk_main();
