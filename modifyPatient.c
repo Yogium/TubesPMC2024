@@ -8,11 +8,7 @@
 #include "struct.h"
 #include "parsingDate.c"
 
-void modifyPatient(DataPasien** head) {
-    char idToModify[20];
-    printf("Masukkan ID pasien yang ingin diubah: ");
-    fgets(idToModify, sizeof(idToModify), stdin);
-    idToModify[strcspn(idToModify, "\n")] = 0;
+void modifyPatient(DataPasien** head, const char* idToModify) {
     DataPasien* temp = *head;
     
     while (temp != NULL) {
@@ -35,50 +31,50 @@ void modifyPatient(DataPasien** head) {
                 getchar();
 
                 switch (choice) { // Dibikin menu dengan switch case
-                    case '1':
+                    case 1:
                         printf("Masukkan nama baru: ");
                         scanf(" %[^\n]", input);
                         strcpy(temp->nama, input);
                         printf("Nama berhasil diganti\n");
                         break;
-                    case '2':
+                    case 2:
                         printf("Masukkan alamat baru: ");
                         scanf(" %[^\n]", input);
                         strcpy(temp->alamat, input);
                         printf("Alamat berhasil diganti\n");
                         break;
-                    case '3':
+                    case 3:
                         printf("Masukkan kota baru: ");
                         scanf(" %[^\n]", input);
                         strcpy(temp->kota, input);
                         printf("Kota berhasil diganti\n");
                         break;
-                    case '4':
+                    case 4:
                         printf("Masukkan tempat lahir baru: ");
                         scanf(" %[^\n]", input);
                         strcpy(temp->tempatLahir, input);
                         printf("Tempat lahir berhasil diganti\n");
                         break;
-                    case '5':
+                    case 5:
                         printf("Masukkan tanggal lahir baru (format: dd mm yyyy or dd-mm-yy): ");
                         scanf(" %[^\n]", input);
                         char original[20];
                         temp->tgllahir = parseDate(input, original);
                         printf("Tanggal lahir berhasil diganti\n");
                         break;
-                    case '6':
+                    case 6:
                         printf("Masukkan umur baru: ");
                         scanf(" %[^\n]", input);
                         temp->umur = atoi(input);
                         printf("Umur berhasil diganti\n");
                         break;
-                    case '7':
+                    case 7:
                         printf("Masukkan no BPJS baru: ");
                         scanf(" %[^\n]", input);
                         strcpy(temp->BPJS, input);
                         printf("No BPJS berhasil diganti\n");
                         break;
-                    case '8':
+                    case 8:
                         printf("Keluar.\n");
                         return;
                     default:
@@ -92,9 +88,16 @@ void modifyPatient(DataPasien** head) {
     printf("Pasien dengan ID %s tidak ditemukan.\n", idToModify);
 }
 
-int main(){
+int main() {
     DataPasien* pasienHead = NULL;
-    modifyPatient(&pasienHead);
+    char idToModify[20];
+
+    printf("Masukkan ID pasien yang ingin diubah: ");
+    fgets(idToModify, sizeof(idToModify), stdin);
+    idToModify[strcspn(idToModify, "\n")] = 0;
+
+    modifyPatient(&pasienHead, idToModify);
+
     return 0;
 }
 
