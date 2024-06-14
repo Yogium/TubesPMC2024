@@ -1,3 +1,5 @@
-addRiwayat.c
-deleteRiwayat.c
-editRiwayat.c
+*.out
+LL
+gui_test
+test
+*.code-workspace
