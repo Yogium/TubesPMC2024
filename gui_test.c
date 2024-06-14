@@ -17,11 +17,17 @@ void button1_clicked(GtkWidget *widget, gpointer data){
     gtk_label_set_text(GTK_LABEL(label), count_str);
 }
 
+void get_text(GtkWidget *widget, gpointer entry){
+    const gchar *text = gtk_entry_get_text(GTK_ENTRY(entry));
+    gtk_label_set_text(GTK_LABEL(label), text);
+}
+
 int main(int argc, char *argv[]){
     GtkWidget *window;
     GtkWidget *button;
     GtkWidget *vbox;
     GtkWidget *button1;
+    GtkWidget *entry;
 
     gtk_init(&argc, &argv);
 
@@ -41,9 +47,14 @@ int main(int argc, char *argv[]){
     //label
     label = gtk_label_new("Button clicked 0 times");
 
+    //entry
+    entry = gtk_entry_new();
+    g_signal_connect(entry, "activate", G_CALLBACK(get_text), entry);
+
     //add button and label to vbox
     gtk_box_pack_start(GTK_BOX(vbox), button, TRUE, TRUE, 0);
     gtk_box_pack_start(GTK_BOX(vbox), button1, TRUE, TRUE, 0);
+    gtk_box_pack_start(GTK_BOX(vbox), entry, TRUE, TRUE, 100);
     gtk_box_pack_start(GTK_BOX(vbox), label, TRUE, TRUE, 0);
 
     //add vbox to window
