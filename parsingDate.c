@@ -31,7 +31,7 @@ date parseDate(char* dateString, char* original) {
         parsedDate.month = getMonthNumber(monthName);
         if (parsedDate.month == 0) {
             fprintf(stderr, "Invalid month name: %s\n", monthName);
-            return parsedDate; // Return with default values on error
+            return parsedDate;
         }
         sprintf(original, "%02d-%02d-%04d", parsedDate.date, parsedDate.month, parsedDate.year);
     } 
@@ -39,7 +39,7 @@ date parseDate(char* dateString, char* original) {
         parsedDate.month = getMonthNumber(monthName);
         if (parsedDate.month == 0) {
             fprintf(stderr, "Invalid month name: %s\n", monthName);
-            return parsedDate; // Return with default values on error
+            return parsedDate;
         }
 
         if (parsedDate.year < 100) {
@@ -126,7 +126,6 @@ int main() {
 
     if (!parseDataFromFile("Data_Pasien.csv", &dates_pasien, &originals_pasien, &dateCount_pasien, &capacity_pasien)) {
         fprintf(stderr, "Failed to parse data from Data_Pasien.csv\n");
-        // Return 1 or another error code to indicate failure
         return 1;
     }
 
@@ -137,7 +136,6 @@ int main() {
 
     if (!parseDataFromFile("Riwayat_Datang.csv", &dates_riwayat, &originals_riwayat, &dateCount_riwayat, &capacity_riwayat)) {
         fprintf(stderr, "Failed to parse data from Riwayat_Datang.csv\n");
-        // Clean up allocated memory before returning
         for (int i = 0; i < dateCount_pasien; i++) {
             free(originals_pasien[i]);
         }
@@ -151,7 +149,6 @@ int main() {
         printf("%s\n", originals_riwayat[i]);
     }
 
-    // Clean up allocated memory
     for (int i = 0; i < dateCount_pasien; i++) {
         free(originals_pasien[i]);
     }
