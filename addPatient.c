@@ -7,9 +7,6 @@
 #include <ctype.h>
 #include "struct.h"
 #include "parsingDate.c"
-#include "LinkedList.c"
-
-date parseDate(char* dateString, char* original);
 
 void addPatient(DataPasien** head) {
     DataPasien* newNode = createDataPasienNode();
@@ -20,7 +17,7 @@ void addPatient(DataPasien** head) {
         temp = temp->next;
     }
 
-    //Ini buat automatically assign index ke last index + 1
+    // Ini buat automatically assign index ke last index + 1
     if (temp != NULL) {
         newNode->index = temp->index + 1; // tambah 1 indexnya
     } else {
@@ -28,29 +25,34 @@ void addPatient(DataPasien** head) {
     }
 
     printf("Nama: ");
-    scanf(" %[^\n]s", newNode->nama);
+    scanf(" %[^\n]", newNode->nama);
 
     printf("Alamat: ");
-    scanf(" %[^\n]s", newNode->alamat);
+    scanf(" %[^\n]", newNode->alamat);
 
     printf("Kota: ");
-    scanf(" %[^\n]s", newNode->kota);
+    scanf(" %[^\n]", newNode->kota);
 
     printf("Tempat Lahir: ");
-    scanf(" %[^\n]s", newNode->tempatLahir);
+    scanf(" %[^\n]", newNode->tempatLahir);
 
-    char dateString[50];
+    int day, year;
+    char monthName[20];
     int validDate = 0;
-    while (!validDate) { // Dibikin agar wajibin user masukin tanggal yang valid, kalo ngga di loop nanti programnya error
-        printf("Tanggal Lahir (dd mmm yyyy): ");
-        fgets(dateString, sizeof(dateString), stdin);
-        dateString[strcspn(dateString, "\n")] = 0;
-        char original[20];
-        newNode->tgllahir = parseDate(dateString, original);
-        if (newNode->tgllahir.date > 0 && newNode->tgllahir.month > 0 && newNode->tgllahir.year > 0) {
-            validDate = 1; // Jadi 1 and break the loop kalo valid
+    while (!validDate) { // Loop until valid date is entered
+        printf("Tanggal Lahir (dd NamaBulan yyyy): ");
+        scanf("%d %s %d", &day, monthName, &year);
+
+        // Validate month using getMonthNumber function
+        int month = getMonthNumber(monthName);
+        if (month > 0 && day > 0 && year > 0) {
+            newNode->tgllahir.date = day;
+            newNode->tgllahir.month = month;
+            newNode->tgllahir.year = year;
+            validDate = 1; // Break the loop if date input is valid
         } else {
-            printf("Format tanggal tidak valid. Masukkan ulang.\n");
+            printf("Invalid. Masukkan ulang.\n");
+            while (getchar() != '\n'); // Clear input buffer
         }
     }
 
@@ -64,7 +66,7 @@ void addPatient(DataPasien** head) {
     scanf("%s", newNode->patientID);
 
     // Add pasien baru
-    insertDataPasienAtEnd(head, newNode); //fungsi ini pake yang dibuat El di linkedlist.c
+    insertDataPasienAtEnd(head, newNode);
 
     printf("Pasien berhasil ditambahkan!\n");
 }
