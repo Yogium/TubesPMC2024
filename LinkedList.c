@@ -243,5 +243,24 @@ void freeDataKunjunganList(DataKunjungan* head) {
     }
 }
 
-// Fungsi utama program
+// // Fungsi utama program
+// int main() {
+//     DataPasien* pasienHead = NULL;
+//     DataKunjungan* kunjunganHead = NULL;
 
+//     // Membaca data pasien dari file
+//     parseDataPasienFromFile("Data_Pasien.csv", &pasienHead);
+//     printf("Data Pasien List:\n");
+//     printDataPasienList(pasienHead);
+
+//     // Membaca data kunjungan dari file
+//     parseDataKunjunganFromFile("Riwayat_Datang.csv", &kunjunganHead);
+//     printf("Data Kunjungan List:\n");
+//     printDataKunjunganList(kunjunganHead);
+
+//     // Membebaskan memori dari linked list
+//     freeDataPasienList(pasienHead);
+//     freeDataKunjunganList(kunjunganHead);
+
+//     return 0;
+// }
