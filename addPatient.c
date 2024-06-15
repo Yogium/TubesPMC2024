@@ -39,20 +39,20 @@ void addPatient(DataPasien** head) {
     int day, year;
     char monthName[20];
     int validDate = 0;
-    while (!validDate) { // Loop until valid date is entered
+    while (!validDate) { // Loop sampai tanggal valid date
         printf("Tanggal Lahir (dd NamaBulan yyyy): ");
         scanf("%d %s %d", &day, monthName, &year);
 
-        // Validate month using getMonthNumber function
+        // Bulan jadi integer
         int month = getMonthNumber(monthName);
         if (month > 0 && day > 0 && year > 0) {
             newNode->tgllahir.date = day;
             newNode->tgllahir.month = month;
             newNode->tgllahir.year = year;
-            validDate = 1; // Break the loop if date input is valid
+            validDate = 1; // Loop keluar kalo valid
         } else {
             printf("Invalid. Masukkan ulang.\n");
-            while (getchar() != '\n'); // Clear input buffer
+            while (getchar() != '\n');
         }
     }
 
