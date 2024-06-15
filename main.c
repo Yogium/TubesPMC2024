@@ -13,6 +13,7 @@
 #include "parsingDate.h"
 #include "searchPatient.c"
 #include "visit_manipulate.c"
+#include "cashflow.c"
 
 int main() {
     DataPasien* pasienHead = NULL;
@@ -36,8 +37,12 @@ int main() {
         printf("2. Hapus Pasien\n");
         printf("3. Modifikasi Pasien\n");
         printf("4. Cari Pasien\n");
-        printf("5. Kunjungan Pasien\n");
-        printf("6. Keluar\n");
+        printf("5. Cashflow\n");
+        printf("6. Tambah Kunjungan\n");
+        printf("7. Hapus Kunjungan\n");
+        printf("8. Modifikasi Kunjungan\n");
+        printf("9. Cari Kunjungan\n");
+        printf("0. Keluar\n");
         printf("Pilihan: ");
         scanf("%d", &choice);
         getchar();
@@ -56,9 +61,21 @@ int main() {
                 searchPatient(pasienHead);
                 break;
             case 5:
-                //visit_manipulate(&pasienHead, &kunjunganHead); / perlu selector
+                cashflow(kunjunganHead);
                 break;
             case 6:
+                addVisitProcess(&kunjunganHead);
+                break;  
+            case 7:
+                deleteVisit(&kunjunganHead);
+                break;
+            case 8:
+                changeVisit(&kunjunganHead);
+                break;
+            case 9:
+                searchVisitProcess(kunjunganHead);
+                break;
+            case 0:
                 break;
             default:
                 printf("Pilihan tidak valid.\n");
