@@ -1,4 +1,6 @@
 #include <gtk/gtk.h>
+#include <string.h>
+#include "gui_pasien.h"
 
 enum controlColumns {
     COL_PATIENT_ID,
@@ -11,6 +13,13 @@ enum sickColumns {
     COL_SICK_COUNT,
     SICK_N_COLUMNS
 };
+
+enum diagColumns {
+    COL_DIAG_NAME,
+    COL_DIAG_TINDAKAN,
+    DIAG_N_COLUMNS
+};
+
 
 void closewindow(GtkWidget *widget, gpointer window){
     gtk_widget_destroy(GTK_WIDGET(window));
@@ -34,19 +43,19 @@ void patient_clicked(GtkWidget *widget){
 
     //add button
     add_button = gtk_button_new_with_label("tambah data pasien");
-    //insert function for add button
+    g_signal_connect(add_button, "clicked", G_CALLBACK(addPatientClicked), NULL);
 
     //edit button
     edit_button = gtk_button_new_with_label("edit data pasien");
     //insert function for edit button
 
-    //delete button
+    //delete button 
     delete_button = gtk_button_new_with_label("hapus data pasien");
     //insert function for delete button
 
     //search button
     search_button = gtk_button_new_with_label("cari data pasien");
-    //insert function for search button
+    g_signal_connect(search_button, "clicked", G_CALLBACK(searchPatientClicked), NULL);
 
     //back button
     back_button = gtk_button_new_with_label("kembali");
@@ -164,6 +173,62 @@ void controlClicked(GtkWidget *widget){
     
 }
 
+void diagClicked(GtkWidget *widget){
+    GtkWidget *window;
+    GtkWidget *vbox;
+    GtkWidget *entry_PID;/*masukkan PID*/
+    GtkWidget *searchButton;/*tombol search*/
+    GtkWidget *patientNameLabel;/*nama pasien*/
+    GtkListStore *diagList;
+    GtkTreeViewColumn *column;
+    GtkWidget *view;
+    GtkWidget *exitButton;
+
+    //create window
+    window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
+    gtk_window_set_title(GTK_WINDOW(window), "riwayat sakit pasien");
+    gtk_window_set_default_size(GTK_WINDOW(window), 500, 500);
+
+    //create vbox
+    vbox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
+
+    //create search button
+    searchButton = gtk_button_new_with_label("Search");
+    //insert function for search button
+
+    //create label
+    patientNameLabel = gtk_label_new("Nama Pasien: ");
+
+    //create entry
+    entry_PID = gtk_entry_new();
+    gtk_entry_set_placeholder_text(GTK_ENTRY(entry_PID), "Masukkan Patient ID");
+
+    //create list
+    diagList = gtk_list_store_new(DIAG_N_COLUMNS, G_TYPE_STRING, G_TYPE_STRING);
+    view = gtk_tree_view_new_with_model(GTK_TREE_MODEL(diagList));
+
+    column = gtk_tree_view_column_new_with_attributes("Diagnosis", gtk_cell_renderer_text_new(), "text", COL_DIAG_NAME, NULL);
+    gtk_tree_view_append_column(GTK_TREE_VIEW(view), column);
+
+    column = gtk_tree_view_column_new_with_attributes("Tindakan", gtk_cell_renderer_text_new(), "text", COL_DIAG_TINDAKAN, NULL);
+    gtk_tree_view_append_column(GTK_TREE_VIEW(view), column);
+
+    //create exit button
+    exitButton = gtk_button_new_with_label("kembali");
+    g_signal_connect(exitButton, "clicked", G_CALLBACK(closewindow), window);
+
+    //add entry to vbox
+    gtk_box_pack_start(GTK_BOX(vbox), entry_PID, TRUE, TRUE, 0);
+    gtk_box_pack_start(GTK_BOX(vbox), searchButton, TRUE, TRUE, 0);
+    gtk_box_pack_start(GTK_BOX(vbox), patientNameLabel, TRUE, TRUE, 0);
+    gtk_box_pack_start(GTK_BOX(vbox), view, TRUE, TRUE, 0);
+    gtk_box_pack_start(GTK_BOX(vbox), exitButton, TRUE, TRUE, 0);
+
+    //add vbox to window
+    gtk_container_add(GTK_CONTAINER(window), vbox);
+    gtk_widget_show_all(window);
+}
+
 void cashflowClicked(GtkWidget *widget){
     GtkWidget *window;
     GtkWidget *vbox;
@@ -205,6 +270,7 @@ void cashflowClicked(GtkWidget *widget){
     gtk_box_pack_start(GTK_BOX(vbox), monthButton, TRUE, TRUE, 0);
     gtk_box_pack_start(GTK_BOX(vbox), averageLabel, TRUE, TRUE, 0);
     gtk_box_pack_start(GTK_BOX(vbox), averageValue, TRUE, TRUE, 0);
+    gtk_box_pack_start(GTK_BOX(vbox), exitButton, TRUE, TRUE, 0);
 
     //add vbox to window
     gtk_container_add(GTK_CONTAINER(window), vbox);
@@ -245,6 +311,7 @@ int main(int argc, char *argv[]){
     GtkWidget *patient_button;
     GtkWidget *cash_button;
     GtkWidget *sick_button;
+    GtkWidget *diag_button; /*tombol untuk riwayat sakit pasien*/
     
     // initialize gtk
     gtk_init(&argc, &argv);
@@ -258,17 +325,21 @@ int main(int argc, char *argv[]){
     vbox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
 
     //patient button
-    patient_button = gtk_button_new_with_label("data pasien");
+    patient_button = gtk_button_new_with_label("Data Pasien");
     g_signal_connect(patient_button, "clicked", G_CALLBACK(patient_clicked), NULL);
 
 
     //visit button  
-    visit_button = gtk_button_new_with_label("data kunjungan");
+    visit_button = gtk_button_new_with_label("Data Kunjungan");
     g_signal_connect(visit_button, "clicked", G_CALLBACK(visitClicked), NULL);
 
     //control button
-    control_button = gtk_button_new_with_label("data kontrol");
+    control_button = gtk_button_new_with_label("Data Kontrol");
     g_signal_connect(control_button, "clicked", G_CALLBACK(controlClicked), NULL);
+
+    //diagnosis button
+    diag_button = gtk_button_new_with_label("Riwayat Sakit Pasien");
+    g_signal_connect(diag_button, "clicked", G_CALLBACK(diagClicked), NULL);
 
     //cash button
     cash_button = gtk_button_new_with_label("Data Kas/Cashflow");
@@ -282,6 +353,7 @@ int main(int argc, char *argv[]){
     gtk_box_pack_start(GTK_BOX(vbox), patient_button, TRUE, TRUE, 0);
     gtk_box_pack_start(GTK_BOX(vbox), visit_button, TRUE, TRUE, 0);
     gtk_box_pack_start(GTK_BOX(vbox), control_button, TRUE, TRUE, 0);
+    gtk_box_pack_start(GTK_BOX(vbox), diag_button, TRUE, TRUE, 0);
     gtk_box_pack_start(GTK_BOX(vbox), cash_button, TRUE, TRUE, 0);
     gtk_box_pack_start(GTK_BOX(vbox), sick_button, TRUE, TRUE, 0);
 

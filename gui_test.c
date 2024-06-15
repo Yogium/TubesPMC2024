@@ -1,7 +1,9 @@
 #include <gtk/gtk.h>
 
+
 static int count = 0;
 static GtkWidget *label;
+
 
 void button_clicked(GtkWidget *widget, gpointer data){
     char count_str[50] = {0};
@@ -20,6 +22,10 @@ void button1_clicked(GtkWidget *widget, gpointer data){
 void get_text(GtkWidget *widget, gpointer entry){
     const gchar *text = gtk_entry_get_text(GTK_ENTRY(entry));
     gtk_label_set_text(GTK_LABEL(label), text);
+}
+
+void printEntry(char *entry){
+    printf("%s\n", entry);
 }
 
 int main(int argc, char *argv[]){
@@ -53,6 +59,7 @@ int main(int argc, char *argv[]){
     //entry
     entry = gtk_entry_new();
     g_signal_connect(entry, "activate", G_CALLBACK(get_text), entry);
+    g_signal_connect(entry, "activate", G_CALLBACK(printEntry), entry);
 
     //grid
     grid = gtk_grid_new();
