@@ -14,6 +14,7 @@
 #include "searchPatient.c"
 #include "visit_manipulate.c"
 #include "cashflow.c"
+#include "controlPatient.c"
 
 int main() {
     DataPasien* pasienHead = NULL;
@@ -75,12 +76,16 @@ int main() {
             case 9:
                 searchVisitProcess(kunjunganHead);
                 break;
+            case 10:
+                findPatientsByControlDate(pasienHead, kunjunganHead, inputControlDate());
+                break;
             case 0:
+                exit(0);
                 break;
             default:
                 printf("Pilihan tidak valid.\n");
         }
-    } while (choice != 6);
+    } while (choice != 0);
 
 
 

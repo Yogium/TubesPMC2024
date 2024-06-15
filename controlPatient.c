@@ -10,7 +10,7 @@
 #include "struct.h"
 #include "LinkedList.h"
 
-typedef struct {
+typedef struct ctrlist{
     char nama[100];
     char patientID[11];
     struct ctrlist* next;
@@ -31,6 +31,7 @@ ctrlist* findPatientsByControlDate(DataPasien* pasienHead, DataKunjungan* kunjun
             kunjunganTemp->control.month == controlDate.month &&
             kunjunganTemp->control.year == controlDate.year) {
                 found = 1;
+                printf("ID Pasien: %s\n", kunjunganTemp->patientID); 
                 if(ctrlistHead == NULL) {
                     ctrlistHead = (ctrlist*)malloc(sizeof(ctrlist));
                     strcpy(ctrlistHead->patientID, kunjunganTemp->patientID);
@@ -53,7 +54,7 @@ ctrlist* findPatientsByControlDate(DataPasien* pasienHead, DataKunjungan* kunjun
 
     // Cari nama pasien
     while(ctrlistHead != NULL) {
-        while(ctrlistHead->nama == NULL){
+        while(ctrlistHead->nama[0] == '\0'){
             if(strcmp(ctrlistHead->patientID, pasienTemp->patientID) == 0){
                 strcpy(ctrlistHead->nama, pasienTemp->nama);
                 pasienTemp = pasienHead;//rewind temp
@@ -66,6 +67,7 @@ ctrlist* findPatientsByControlDate(DataPasien* pasienHead, DataKunjungan* kunjun
     if (!found) {
         printf("Tidak ada pasien yang kontrol pada tanggal tersebut.\n");
     }
+    return ctrlistHead;
 }
 
 // Fungsi untuk input tanggal dari pengguna
@@ -78,13 +80,13 @@ date inputControlDate() {
 }
 
 // Fungsi utama program
-int main() {
-    DataPasien* pasienHead = NULL;
-    DataKunjungan* kunjunganHead = NULL;
+// int control() {
+//     DataPasien* pasienHead = NULL;
+//     DataKunjungan* kunjunganHead = NULL;
 
-    // Input tanggal dari pengguna
-    date controlDate = inputControlDate();
+//     // Input tanggal dari pengguna
+//     date controlDate = inputControlDate();
 
-    // Cari pasien yang kontrol pada tanggal yang diinput
-    ctrlist* listhead = findPatientsByControlDate(pasienHead, kunjunganHead, controlDate);
-}
+//     // Cari pasien yang kontrol pada tanggal yang diinput
+//     ctrlist* listhead = findPatientsByControlDate(pasienHead, kunjunganHead, controlDate);
+// }

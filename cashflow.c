@@ -130,26 +130,26 @@ void cashflow(DataKunjungan *head){
 
 // Fungsi utama program
 
-int main() {
-    DataPasien* pasienHead = NULL;
-    DataKunjungan* kunjunganHead = NULL;
+// int main() {
+//     DataPasien* pasienHead = NULL;
+//     DataKunjungan* kunjunganHead = NULL;
 
-    // Membaca data pasien dari file
-    parseDataPasienFromFile("Data_Pasien.csv", &pasienHead);
-    printf("Data Pasien List:\n");
-    printDataPasienList(pasienHead);
+//     // Membaca data pasien dari file
+//     parseDataPasienFromFile("Data_Pasien.csv", &pasienHead);
+//     printf("Data Pasien List:\n");
+//     printDataPasienList(pasienHead);
 
-    // Membaca data kunjungan dari file
-    parseDataKunjunganFromFile("Riwayat_Datang.csv", &kunjunganHead);
-    printf("Data Kunjungan List:\n");
-    printDataKunjunganList(kunjunganHead);
+//     // Membaca data kunjungan dari file
+//     parseDataKunjunganFromFile("Riwayat_Datang.csv", &kunjunganHead);
+//     printf("Data Kunjungan List:\n");
+//     printDataKunjunganList(kunjunganHead);
 
-    //call cashflow
-    cashflow(kunjunganHead);
+//     //call cashflow
+//     cashflow(kunjunganHead);
 
-    // Membebaskan memori dari linked list
-    freeDataPasienList(pasienHead);
-    freeDataKunjunganList(kunjunganHead);
+//     // Membebaskan memori dari linked list
+//     freeDataPasienList(pasienHead);
+//     freeDataKunjunganList(kunjunganHead);
 
-    return 0;
-}
+//     return 0;
+// }
