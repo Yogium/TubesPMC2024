@@ -328,27 +328,37 @@ void diagClicked(GtkWidget *widget, gpointer data){
 
 void sickClicked(GtkWidget *widget, gpointer data){
     GtkWidget *window;
-    GtkListStore *sickList;
-    GtkTreeViewColumn *column;
-    GtkWidget *view;
+    GtkWidget *vbox;
+    GtkWidget *exitButton;
+    GtkWidget *yearButton;
+    GtkWidget *monthButton;
 
     //create window
     window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
     gtk_window_set_title(GTK_WINDOW(window), "data penyakit");
-    gtk_window_set_default_size(GTK_WINDOW(window), 500, 500);
+    gtk_window_set_default_size(GTK_WINDOW(window), 300, 300);
 
-    //create sicklist
-    sickList = gtk_list_store_new(SICK_N_COLUMNS, G_TYPE_STRING/*nama penyakit*/, G_TYPE_INT/*jumlah pasien*/);
-    view = gtk_tree_view_new_with_model(GTK_TREE_MODEL(sickList));
+    //create vbox
+    vbox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
 
-    column = gtk_tree_view_column_new_with_attributes("Sick Name", gtk_cell_renderer_text_new(), "text", COL_SICK_NAME, NULL);
-    gtk_tree_view_append_column(GTK_TREE_VIEW(view), column);
+    //create year button
+    yearButton = gtk_button_new_with_label("Lihat Data Penyakit per Tahun");
 
-    column = gtk_tree_view_column_new_with_attributes("Sick Count", gtk_cell_renderer_text_new(), "text", COL_SICK_COUNT, NULL);
-    gtk_tree_view_append_column(GTK_TREE_VIEW(view), column);
+    //create month button
+    monthButton = gtk_button_new_with_label("Lihat Data Penyakit per Bulan");
 
-    //add view to window
-    gtk_container_add(GTK_CONTAINER(window), view);
+    //create exit button
+
+    exitButton = gtk_button_new_with_label("Kembali");
+    g_signal_connect(exitButton, "clicked", G_CALLBACK(closeWindow), window);
+
+    //add button to vbox
+    gtk_box_pack_start(GTK_BOX(vbox), yearButton, TRUE, TRUE, 0);
+    gtk_box_pack_start(GTK_BOX(vbox), monthButton, TRUE, TRUE, 0);
+    gtk_box_pack_start(GTK_BOX(vbox), exitButton, TRUE, TRUE, 0);
+
+   //add view to window
+    gtk_container_add(GTK_CONTAINER(window), vbox);
     gtk_widget_show_all(window);
 }
 
@@ -403,7 +413,7 @@ int main(int argc, char *argv[]){
 
     //sick button
     sick_button = gtk_button_new_with_label("Data Penyakit");
-    g_signal_connect(sick_button, "clicked", G_CALLBACK(sickClicked), NULL);
+    g_signal_connect(sick_button, "clicked", G_CALLBACK(sickClicked), kunjunganHead);
 
     //add button to vbox
     gtk_box_pack_start(GTK_BOX(vbox), patient_button, TRUE, TRUE, 0);

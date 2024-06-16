@@ -3,3 +3,4 @@ LL
 gui_test
 test
 *.code-workspace
+gui_test.c
