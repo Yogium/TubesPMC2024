@@ -1,8 +1,14 @@
 #include <gtk/gtk.h>
-
+#include <string.h>
 
 static int count = 0;
 static GtkWidget *label;
+
+
+typedef struct{
+    GtkWidget *entry;
+    char *string;
+}entryString;
 
 
 void button_clicked(GtkWidget *widget, gpointer data){
@@ -20,12 +26,31 @@ void button1_clicked(GtkWidget *widget, gpointer data){
 }
 
 void get_text(GtkWidget *widget, gpointer entry){
+    entryString *es = (entryString *)entry;
     const gchar *text = gtk_entry_get_text(GTK_ENTRY(entry));
     gtk_label_set_text(GTK_LABEL(label), text);
 }
 
-void printEntry(char *entry){
-    printf("%s\n", entry);
+void printEntry(GtkWidget *entry){
+   const gchar *text = gtk_entry_get_text(GTK_ENTRY(entry));
+   printf("%s\n", text);
+   if(strcmp(text, "test")==0){
+         gtk_label_set_text(GTK_LABEL(label), "Test");
+    }
+    else{
+         gtk_label_set_text(GTK_LABEL(label), "Not Test");
+   } 
+}
+
+void combineEntry(GtkWidget *button, gpointer data){
+    GtkWidget **entries = (GtkWidget **)data;
+    const gchar *text = gtk_entry_get_text(GTK_ENTRY(entries[0]));
+    const gchar *text2 = gtk_entry_get_text(GTK_ENTRY(entries[1]));
+    char *combined = malloc(strlen(text) + strlen(text2) + 1);
+    strcpy(combined, text);
+    strcat(combined, text2);
+    gtk_label_set_text(GTK_LABEL(label), combined);
+    free(combined);
 }
 
 int main(int argc, char *argv[]){
@@ -35,7 +60,9 @@ int main(int argc, char *argv[]){
     GtkWidget *hbox;
     GtkWidget *button1;
     GtkWidget *entry;
-    GtkWidget *grid;
+    GtkWidget *entry2;
+    GtkWidget *saveButton;
+
 
     gtk_init(&argc, &argv);
 
@@ -58,26 +85,23 @@ int main(int argc, char *argv[]){
 
     //entry
     entry = gtk_entry_new();
-    g_signal_connect(entry, "activate", G_CALLBACK(get_text), entry);
-    g_signal_connect(entry, "activate", G_CALLBACK(printEntry), entry);
+    //g_signal_connect(entry, "activate", G_CALLBACK(get_text), entry->entry);
 
-    //grid
-    grid = gtk_grid_new();
-    GtkWidget *label1 = gtk_label_new("Hello");
-    gtk_grid_attach(GTK_GRID(grid), label1, 0, 0, 1, 1);
-    GtkWidget *label2 = gtk_label_new("Label 2");
-    GtkWidget *entry1 = gtk_entry_new();
-    GtkWidget *entry2 = gtk_entry_new();
+    entry2 = gtk_entry_new();
 
+    GtkWidget *entries[2] = {entry, entry2};
+
+    saveButton = gtk_button_new_with_label("Save");
+    g_signal_connect(saveButton, "clicked", G_CALLBACK(combineEntry), entries);
     //add button and label to vbox
     gtk_box_pack_start(GTK_BOX(hbox), button, TRUE, TRUE, 0);
     gtk_box_pack_start(GTK_BOX(hbox), button1, TRUE, TRUE, 0);
     gtk_box_pack_start(GTK_BOX(vbox), entry, TRUE, TRUE, 100);
+    gtk_box_pack_start(GTK_BOX(vbox), entry2, TRUE, TRUE, 100);
+    gtk_box_pack_start(GTK_BOX(vbox), saveButton, TRUE, TRUE, 0);
     gtk_box_pack_start(GTK_BOX(vbox), label, TRUE, TRUE, 0);
-    gtk_box_pack_start(GTK_BOX(vbox), grid, TRUE, TRUE, 0);
     //add vbox to window
     gtk_container_add(GTK_CONTAINER(window), vbox);
-    gtk_container_add(GTK_CONTAINER(window), hbox);
     g_signal_connect(window, "destroy", G_CALLBACK(gtk_main_quit), NULL);
     gtk_widget_show_all(window);
     gtk_main();

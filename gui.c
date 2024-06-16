@@ -47,11 +47,11 @@ void patient_clicked(GtkWidget *widget){
 
     //edit button
     edit_button = gtk_button_new_with_label("edit data pasien");
-    //insert function for edit button
+    g_signal_connect(edit_button, "clicked", G_CALLBACK(editPatientClicked), NULL);
 
     //delete button 
     delete_button = gtk_button_new_with_label("hapus data pasien");
-    //insert function for delete button
+    g_signal_connect(delete_button, "clicked", G_CALLBACK(delPatientClicked), NULL);
 
     //search button
     search_button = gtk_button_new_with_label("cari data pasien");
@@ -143,7 +143,7 @@ void controlClicked(GtkWidget *widget){
 
 
     //create label
-    label = gtk_label_new("Masukkan Tanggal dalam Format dd/mm/yyyy");
+    label = gtk_label_new("Masukkan Tanggal dalam Format dd mm yyyy");
 
     //create window
     window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
