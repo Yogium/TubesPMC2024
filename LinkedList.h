@@ -160,8 +160,20 @@ void parseDataKunjunganFromFile(const char* filename, DataKunjungan** head) {
                     case 0: newNode->index = atoi(token); break;
                     case 1: strcpy(dateString, token); break;
                     case 2: strcpy(newNode->patientID, token); break;
-                    case 3: newNode->diagnosis = atoi(token); break;
-                    case 4: newNode->tindakan = atoi(token); break;
+                    case 3: 
+                        for(int i = 0; i < 4; i++){
+                            if(strcmp(penyakit[i], token) == 0){
+                                newNode->diagnosis = i;
+                            }
+                        }
+                        break;
+                    case 4: 
+                        for(int i = 0; i < 6; i++){
+                            if(strcmp(tindakan[i].nama, token) == 0){
+                                newNode->tindakan = i;
+                            }
+                        }
+                        break;
                     case 5: strcpy(controlDateString, token); break;
                 }
                 colomnCount++;
