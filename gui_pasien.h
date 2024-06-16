@@ -2,6 +2,9 @@
 #include <string.h>
 #include <stdio.h>
 #include "gui_commonfunc.h"
+#include "modifyPatient.c"
+#include <stdlib.h>
+#include "searchPatient.c"
 
 #ifndef GUI_PASIEN_H
 
@@ -9,6 +12,7 @@ enum patientColumns{
     COL_NAME,
     COL_ADDRESS,
     COL_CITY,
+    COL_BIRTHPLACE,
     COL_BIRTHDATE,
     COL_AGE,
     COL_BPJS,
@@ -35,8 +39,6 @@ void addPatientClicked(GtkWidget *widget){
     GtkWidget *entry_PID;
     GtkWidget *button_save;/*button untuk menyimpan data pasien*/
     GtkWidget *button_cancel;/*button untuk membatalkan input data pasien*/
-
-
 
     //create window
     window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
@@ -101,13 +103,36 @@ void addPatientClicked(GtkWidget *widget){
     gtk_widget_show_all(window);
 }
 
-void editNamaClicked(GtkWidget *widget){
-    GtkWidget *window;
-    GtkWidget *vbox;
-    
+struct searchPatientData{
+    DataPasien *pasien;
+    GtkWidget *entryChoice;
+    GtkListStore *searchList;
+};
+
+void searchPatientButtonClicked(GtkWidget *widget, gpointer data){
+    if(data == NULL){
+        printf("Data tidak ditemukan\n");
+        return;
+    }
+    DataPasien *pasien = ((struct searchPatientData*)data)->pasien;
+    const gchar *input = gtk_entry_get_text(GTK_ENTRY(((struct searchPatientData*)data)->entryChoice));
+    DataPasien *foundPasienHead = NULL;
+    char searchID[20];
+    strcpy(searchID, input);
+    foundPasienHead = searchPatient(pasien, searchID);
+    DataPasien *searched = foundPasienHead;
+    GtkListStore *searchList = ((struct searchPatientData*)data)->searchList;
+    gtk_list_store_clear(searchList);
+    while(searched != NULL){
+        GtkTreeIter iter;
+        char birthdate[20];
+        sprintf(birthdate, "%d-%d-%d", searched->tgllahir.date, searched->tgllahir.month, searched->tgllahir.year);
+        gtk_list_store_insert_with_values(searchList, &iter, -1, COL_NAME, searched->nama, COL_ADDRESS, searched->alamat, COL_CITY, searched->kota, COL_BIRTHPLACE, searched->tempatLahir, COL_BIRTHDATE, birthdate , COL_AGE, searched->umur, COL_BPJS, searched->BPJS, COL_PID, searched->patientID, -1);
+        searched = searched->next;
+    }
 }
 
-void searchPatientClicked(GtkWidget *widget){
+void searchPatientClicked(GtkWidget *widget, gpointer data){
     GtkWidget *window;
     GtkWidget *vbox;
     GtkWidget *entryChoice;
@@ -115,12 +140,15 @@ void searchPatientClicked(GtkWidget *widget){
     GtkListStore *searchList;
     GtkTreeViewColumn *column;
     GtkWidget *view;
-    char PID[11];
+
+    DataPasien *pasien = (DataPasien*)data;
+    struct searchPatientData *searchData = malloc(sizeof(struct searchPatientData));
+    searchData->pasien = pasien;
 
     //create window
     window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
     gtk_window_set_title(GTK_WINDOW(window), "Cari Data Pasien");
-    gtk_window_set_default_size(GTK_WINDOW(window), 500, 200);
+    gtk_window_set_default_size(GTK_WINDOW(window), 500, 500);
     
     //create vbox
     vbox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
@@ -128,16 +156,11 @@ void searchPatientClicked(GtkWidget *widget){
     //create entry choice
     entryChoice = gtk_entry_new();
     gtk_entry_set_placeholder_text(GTK_ENTRY(entryChoice), "Masukkan ID pasien yang ingin dicari");
-    g_signal_connect(entryChoice, "activate", G_CALLBACK(getTextInput), entryChoice);
-
-    //create search button
-    button_search = gtk_button_new_with_label("Search");
-    g_signal_connect(button_search, "clicked", G_CALLBACK(closeWindow)/*insert fungsi search pasien*/, window);
-    //insert fungsi buat search di sini
+    searchData->entryChoice = entryChoice;
 
 
     //create list store
-    searchList = gtk_list_store_new(PATIENT_N_COLS, G_TYPE_STRING/*NAMA*/, G_TYPE_STRING/*ALAMAT*/, G_TYPE_STRING/*KOTA*/, G_TYPE_STRING/*TEMPAT TANGGAL LAHIR*/, G_TYPE_INT/*UMUR*/, G_TYPE_STRING/*BPJS*/, G_TYPE_STRING/*PID*/);
+    searchList = gtk_list_store_new(PATIENT_N_COLS, G_TYPE_STRING/*NAMA*/, G_TYPE_STRING/*ALAMAT*/, G_TYPE_STRING/*KOTA*/, G_TYPE_STRING/*TEMPAT LAHIR*/, G_TYPE_STRING/*TANGGAL LAHIR*/, G_TYPE_INT/*UMUR*/, G_TYPE_STRING/*BPJS*/, G_TYPE_STRING/*PID*/);
     view = gtk_tree_view_new_with_model(GTK_TREE_MODEL(searchList));
 
     column = gtk_tree_view_column_new_with_attributes("Nama", gtk_cell_renderer_text_new(), "text", COL_NAME, NULL);
@@ -149,7 +172,10 @@ void searchPatientClicked(GtkWidget *widget){
     column = gtk_tree_view_column_new_with_attributes("Kota", gtk_cell_renderer_text_new(), "text", COL_CITY, NULL);
     gtk_tree_view_append_column(GTK_TREE_VIEW(view), column);
 
-    column = gtk_tree_view_column_new_with_attributes("Tempat dan Tanggal Lahir", gtk_cell_renderer_text_new(), "text", COL_BIRTHDATE, NULL);
+    column = gtk_tree_view_column_new_with_attributes("Tempat Lahir", gtk_cell_renderer_text_new(), "text", COL_BIRTHPLACE, NULL);
+    gtk_tree_view_append_column(GTK_TREE_VIEW(view), column);
+
+    column = gtk_tree_view_column_new_with_attributes("Tanggal Lahir", gtk_cell_renderer_text_new(), "text", COL_BIRTHDATE, NULL);
     gtk_tree_view_append_column(GTK_TREE_VIEW(view), column);
 
     column = gtk_tree_view_column_new_with_attributes("Umur", gtk_cell_renderer_text_new(), "text", COL_AGE, NULL);
@@ -161,6 +187,12 @@ void searchPatientClicked(GtkWidget *widget){
     column = gtk_tree_view_column_new_with_attributes("Patient ID", gtk_cell_renderer_text_new(), "text", COL_PID, NULL);
     gtk_tree_view_append_column(GTK_TREE_VIEW(view), column);
 
+    searchData->searchList = searchList;
+
+    //click search button
+    button_search = gtk_button_new_with_label("Cari");
+    g_signal_connect(button_search, "clicked", G_CALLBACK(searchPatientButtonClicked), searchData);
+    
     //pack all widget
     gtk_box_pack_start(GTK_BOX(vbox), entryChoice, TRUE, TRUE, 0);
     gtk_box_pack_start(GTK_BOX(vbox), button_search, TRUE, TRUE, 0);
@@ -170,39 +202,137 @@ void searchPatientClicked(GtkWidget *widget){
     gtk_widget_show_all(window);
 }
 
-void editPatientClicked(GtkWidget *widget){
+struct editPatientData{
+    GtkWidget *window;
+    DataPasien *pasien;
+    GtkWidget *PIDEntry;
+    GtkWidget *nameEntry;
+    GtkWidget *addressEntry;
+    GtkWidget *cityEntry;
+    GtkWidget *birthdateEntry;
+    GtkWidget *ageEntry;
+    GtkWidget *bpjsEntry;
+};
+
+void editPatientSaveClicked(GtkWidget *widget, gpointer data){
+    //taking the data from entries
+    GtkWidget *window = ((struct editPatientData*)data)->window;
+    DataPasien *pasien = ((struct editPatientData*)data)->pasien;
+    const gchar *PID = gtk_entry_get_text(GTK_ENTRY(((struct editPatientData*)data)->PIDEntry));
+    const gchar *name = gtk_entry_get_text(GTK_ENTRY(((struct editPatientData*)data)->nameEntry));
+    const gchar *address = gtk_entry_get_text(GTK_ENTRY(((struct editPatientData*)data)->addressEntry));
+    const gchar *city = gtk_entry_get_text(GTK_ENTRY(((struct editPatientData*)data)->cityEntry));
+    const gchar *birthdate = gtk_entry_get_text(GTK_ENTRY(((struct editPatientData*)data)->birthdateEntry));
+    const gchar *age = gtk_entry_get_text(GTK_ENTRY(((struct editPatientData*)data)->ageEntry));
+    const gchar *bpjs = gtk_entry_get_text(GTK_ENTRY(((struct editPatientData*)data)->bpjsEntry));
+
+    //convert to strings
+    char PIDstr[11];
+    char namestr[50];
+    char addressstr[100];
+    char citystr[20];
+    char birthdatestr[20];
+    char agestr[3];
+    char bpjsstr[20];
+
+    strcpy(PIDstr, PID);
+    strcpy(namestr, name);
+    strcpy(addressstr, address);
+    strcpy(citystr, city);
+    strcpy(birthdatestr, birthdate);
+    strcpy(agestr, age);
+    strcpy(bpjsstr, bpjs);
+
+    //split birthdaystr into kota lahir and tanggal lahir
+    char *token = strtok(birthdatestr, "/");
+    char birthcity[20];
+    char Fbirthdatestr[20];
+    if(token != NULL){
+        strcpy(birthcity, token);
+        token = strtok(NULL, "/");
+        if(token != NULL){
+            strcpy(Fbirthdatestr, token);
+        }
+    }
+
+    //edit the data
+    modifyPatient(&pasien, PIDstr, namestr, addressstr, citystr, birthcity, Fbirthdatestr, atoi(agestr), bpjsstr);
+    closeWindow(widget, window);
+}
+
+void editPatientClicked(GtkWidget *widget, gpointer data){
     GtkWidget *window;
     GtkWidget *vbox;
-    GtkWidget *nameButton;
-    GtkWidget *addressButton;
-    GtkWidget *cityButton;
-    GtkWidget *birthdateButton;
-    GtkWidget *ageButton;
-    GtkWidget *bpjsButton;
+    GtkWidget *PIDEntry;
+    GtkWidget *nameEntry;
+    GtkWidget *addressEntry;
+    GtkWidget *cityEntry;
+    GtkWidget *birthdateEntry;
+    GtkWidget *ageEntry;
+    GtkWidget *bpjsEntry;
+    GtkWidget *saveButton;/*button untuk menyimpan data pasien*/
+
+    DataPasien *pasien = (DataPasien*)data;
+    struct editPatientData *editData = malloc(sizeof(struct editPatientData));
+    editData->pasien = pasien;
 
     //create window
     window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
     gtk_window_set_title(GTK_WINDOW(window), "Edit Data Pasien");
     gtk_window_set_default_size(GTK_WINDOW(window), 500, 500);
+    editData->window = window;
 
     //create vbox
     vbox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
 
-    //create button
-    nameButton = gtk_button_new_with_label("Edit Nama");
-    addressButton = gtk_button_new_with_label("Edit Alamat");
-    cityButton = gtk_button_new_with_label("Edit Kota");
-    birthdateButton = gtk_button_new_with_label("Edit Tempat dan Tanggal Lahir");
-    ageButton = gtk_button_new_with_label("Edit Umur");
-    bpjsButton = gtk_button_new_with_label("Edit BPJS");
+    //create entry PID
+    PIDEntry = gtk_entry_new();
+    gtk_entry_set_placeholder_text(GTK_ENTRY(PIDEntry), "Masukkan ID pasien yang ingin diedit");
+    editData->PIDEntry = PIDEntry;
+
+    //create entry name
+    nameEntry = gtk_entry_new();
+    gtk_entry_set_placeholder_text(GTK_ENTRY(nameEntry), "Nama Pasien");
+    editData->nameEntry = nameEntry;
+
+    //create entry address
+    addressEntry = gtk_entry_new();
+    gtk_entry_set_placeholder_text(GTK_ENTRY(addressEntry), "Alamat Pasien");
+    editData->addressEntry = addressEntry;
+
+    //create entry city
+    cityEntry = gtk_entry_new();
+    gtk_entry_set_placeholder_text(GTK_ENTRY(cityEntry), "Kota");
+    editData->cityEntry = cityEntry;
+
+    //create entry birthdate
+    birthdateEntry = gtk_entry_new();
+    gtk_entry_set_placeholder_text(GTK_ENTRY(birthdateEntry), "Tempat dan Tanggal Lahir (dalam format kota/tanggal contoh: Jakarta/01 Januari 2000)");
+    editData->birthdateEntry = birthdateEntry;
+
+    //create entry age
+    ageEntry = gtk_entry_new();
+    gtk_entry_set_placeholder_text(GTK_ENTRY(ageEntry), "Umur Pasien");
+    editData->ageEntry = ageEntry;
+
+    //create entry bpjs
+    bpjsEntry = gtk_entry_new();
+    gtk_entry_set_placeholder_text(GTK_ENTRY(bpjsEntry), "Nomor BPJS Pasien");
+    editData->bpjsEntry = bpjsEntry;
+
+    //create save button
+    saveButton = gtk_button_new_with_label("Simpan");
+    g_signal_connect(saveButton, "clicked", G_CALLBACK(editPatientSaveClicked), editData);
 
     //pack all widget
-    gtk_box_pack_start(GTK_BOX(vbox), nameButton, TRUE, TRUE, 0);
-    gtk_box_pack_start(GTK_BOX(vbox), addressButton, TRUE, TRUE, 0);
-    gtk_box_pack_start(GTK_BOX(vbox), cityButton, TRUE, TRUE, 0);
-    gtk_box_pack_start(GTK_BOX(vbox), birthdateButton, TRUE, TRUE, 0);
-    gtk_box_pack_start(GTK_BOX(vbox), ageButton, TRUE, TRUE, 0);
-    gtk_box_pack_start(GTK_BOX(vbox), bpjsButton, TRUE, TRUE, 0);
+    gtk_box_pack_start(GTK_BOX(vbox), PIDEntry, TRUE, TRUE, 0);
+    gtk_box_pack_start(GTK_BOX(vbox), nameEntry, TRUE, TRUE, 0);
+    gtk_box_pack_start(GTK_BOX(vbox), addressEntry, TRUE, TRUE, 0);
+    gtk_box_pack_start(GTK_BOX(vbox), cityEntry, TRUE, TRUE, 0);
+    gtk_box_pack_start(GTK_BOX(vbox), birthdateEntry, TRUE, TRUE, 0);
+    gtk_box_pack_start(GTK_BOX(vbox), ageEntry, TRUE, TRUE, 0);
+    gtk_box_pack_start(GTK_BOX(vbox), bpjsEntry, TRUE, TRUE, 0);
+    gtk_box_pack_start(GTK_BOX(vbox), saveButton, TRUE, TRUE, 0);
 
     gtk_container_add(GTK_CONTAINER(window), vbox);
     gtk_widget_show_all(window);

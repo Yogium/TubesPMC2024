@@ -4,7 +4,6 @@
 #include "LinkedList.h"
 #include "gui_pasien.h"
 #include "controlPatient.c"
-#include "searchPatient.c"
 #include "gui_cashflow.h"
 #include "gui_commonfunc.h"
 
@@ -49,6 +48,8 @@ void patient_clicked(GtkWidget *widget, gpointer data){
     GtkWidget *search_button;
     GtkWidget *back_button;
 
+    DataPasien *pasien = ((struct generalLL*)data)->pasien;
+
     window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
     gtk_window_set_title(GTK_WINDOW(window), "data pasien");
     gtk_window_set_default_size(GTK_WINDOW(window), 500, 500);
@@ -58,19 +59,19 @@ void patient_clicked(GtkWidget *widget, gpointer data){
 
     //add button
     add_button = gtk_button_new_with_label("tambah data pasien");
-    g_signal_connect(add_button, "clicked", G_CALLBACK(addPatientClicked), NULL);
+    g_signal_connect(add_button, "clicked", G_CALLBACK(addPatientClicked), pasien);
 
     //edit button
     edit_button = gtk_button_new_with_label("edit data pasien");
-    g_signal_connect(edit_button, "clicked", G_CALLBACK(editPatientClicked), NULL);
+    g_signal_connect(edit_button, "clicked", G_CALLBACK(editPatientClicked), pasien);
 
     //delete button 
     delete_button = gtk_button_new_with_label("hapus data pasien");
-    g_signal_connect(delete_button, "clicked", G_CALLBACK(delPatientClicked), NULL);
+    g_signal_connect(delete_button, "clicked", G_CALLBACK(delPatientClicked), pasien);
 
     //search button
     search_button = gtk_button_new_with_label("cari data pasien");
-    g_signal_connect(search_button, "clicked", G_CALLBACK(searchPatientClicked), NULL);
+    g_signal_connect(search_button, "clicked", G_CALLBACK(searchPatientClicked), pasien);
 
     //back button
     back_button = gtk_button_new_with_label("kembali");
