@@ -4,6 +4,9 @@
 #include "LinkedList.h"
 #include "gui_pasien.h"
 #include "controlPatient.c"
+#include "searchPatient.c"
+#include "gui_cashflow.h"
+#include "gui_commonfunc.h"
 
 enum controlColumns {
     COL_PATIENT_ID,
@@ -36,9 +39,6 @@ struct generalLL{
 };
 
 
-void closewindow(GtkWidget *widget, gpointer window){
-    gtk_widget_destroy(GTK_WIDGET(window));
-}
 
 void patient_clicked(GtkWidget *widget, gpointer data){
     GtkWidget *window;
@@ -74,7 +74,7 @@ void patient_clicked(GtkWidget *widget, gpointer data){
 
     //back button
     back_button = gtk_button_new_with_label("kembali");
-    g_signal_connect(back_button, "clicked", G_CALLBACK(closewindow), window);
+    g_signal_connect(back_button, "clicked", G_CALLBACK(closeWindow), window);
 
     //add button to vbox
     gtk_box_pack_start(GTK_BOX(vbox), add_button, TRUE, TRUE, 0);
@@ -122,7 +122,7 @@ void visitClicked(GtkWidget *widget, gpointer data){
 
     //back button
     back_button = gtk_button_new_with_label("kembali");
-    g_signal_connect(back_button, "clicked", G_CALLBACK(closewindow), window);
+    g_signal_connect(back_button, "clicked", G_CALLBACK(closeWindow), window);
 
     //add button to vbox
     gtk_box_pack_start(GTK_BOX(vbox), add_button, TRUE, TRUE, 0);
@@ -206,7 +206,7 @@ void controlClicked(GtkWidget *widget, gpointer data){
 
     //create exit button
     exitButton = gtk_button_new_with_label("kembali");
-    g_signal_connect(exitButton, "clicked", G_CALLBACK(closewindow), window);
+    g_signal_connect(exitButton, "clicked", G_CALLBACK(closeWindow), window);
 
     //add entry to vbox
     gtk_box_pack_start(GTK_BOX(vbox), label, TRUE, TRUE, 0);
@@ -263,7 +263,7 @@ void diagClicked(GtkWidget *widget, gpointer data){
 
     //create exit button
     exitButton = gtk_button_new_with_label("kembali");
-    g_signal_connect(exitButton, "clicked", G_CALLBACK(closewindow), window);
+    g_signal_connect(exitButton, "clicked", G_CALLBACK(closeWindow), window);
 
     //add entry to vbox
     gtk_box_pack_start(GTK_BOX(vbox), entry_PID, TRUE, TRUE, 0);
@@ -277,53 +277,54 @@ void diagClicked(GtkWidget *widget, gpointer data){
     gtk_widget_show_all(window);
 }
 
-void cashflowClicked(GtkWidget *widget, gpointer data){
-    GtkWidget *window;
-    GtkWidget *vbox;
-    GtkWidget *exitButton;
-    GtkWidget *yearButton;
-    GtkWidget *monthButton;
-    GtkWidget *averageLabel;
-    GtkWidget *averageValue; 
-    //create window
-    window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
-    gtk_window_set_title(GTK_WINDOW(window), "data kas");
-    gtk_window_set_default_size(GTK_WINDOW(window), 500, 500);
+// void cashflowClicked(GtkWidget *widget, gpointer data){
+//     GtkWidget *window;
+//     GtkWidget *vbox;
+//     GtkWidget *exitButton;
+//     GtkWidget *yearButton;
+//     GtkWidget *monthButton;
+//     GtkWidget *averageLabel;
+//     GtkWidget *averageValue; 
+//     //create window
+//     window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
+//     gtk_window_set_title(GTK_WINDOW(window), "data kas");
+//     gtk_window_set_default_size(GTK_WINDOW(window), 500, 500);
 
-    //create vbox
-    vbox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
+//     //create vbox
+//     vbox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
 
-    //create year button
-    yearButton = gtk_button_new_with_label("Lihat Data Kas per Tahun");
-    //insert function for year button
+//     //create year button
+//     yearButton = gtk_button_new_with_label("Lihat Data Kas per Tahun");
+//     //insert function for year button
 
-    //create month button
-    monthButton = gtk_button_new_with_label("Lihat Data Kas per Bulan");
-    //insert function for month button
+//     //create month button
+//     monthButton = gtk_button_new_with_label("Lihat Data Kas per Bulan");
+//     //insert function for month button
 
-    //create average label
-    averageLabel = gtk_label_new("Rata-rata Kas Setiap Tahun");
-    float average = 0;//insert function to get average
-    char averageString[100];
-    sprintf(averageString, "Rp. %.2f", average);
-    averageValue = gtk_label_new(averageString);
+//     //create average label
+//     float averagePerYear = 
+//     averageLabel = gtk_label_new("Rata-rata Kas Setiap Tahun");
+//     float average = 0;//insert function to get average
+//     char averageString[100];
+//     sprintf(averageString, "Rp. %.2f", average);
+//     averageValue = gtk_label_new(averageString);
 
 
-    //create exit button
-    exitButton = gtk_button_new_with_label("kembali");
-    g_signal_connect(exitButton, "clicked", G_CALLBACK(closewindow), window);
+//     //create exit button
+//     exitButton = gtk_button_new_with_label("kembali");
+//     g_signal_connect(exitButton, "clicked", G_CALLBACK(closeWindow), window);
 
-    //add button to vbox
-    gtk_box_pack_start(GTK_BOX(vbox), yearButton, TRUE, TRUE, 0);
-    gtk_box_pack_start(GTK_BOX(vbox), monthButton, TRUE, TRUE, 0);
-    gtk_box_pack_start(GTK_BOX(vbox), averageLabel, TRUE, TRUE, 0);
-    gtk_box_pack_start(GTK_BOX(vbox), averageValue, TRUE, TRUE, 0);
-    gtk_box_pack_start(GTK_BOX(vbox), exitButton, TRUE, TRUE, 0);
+//     //add button to vbox
+//     gtk_box_pack_start(GTK_BOX(vbox), yearButton, TRUE, TRUE, 0);
+//     gtk_box_pack_start(GTK_BOX(vbox), monthButton, TRUE, TRUE, 0);
+//     gtk_box_pack_start(GTK_BOX(vbox), averageLabel, TRUE, TRUE, 0);
+//     gtk_box_pack_start(GTK_BOX(vbox), averageValue, TRUE, TRUE, 0);
+//     gtk_box_pack_start(GTK_BOX(vbox), exitButton, TRUE, TRUE, 0);
 
-    //add vbox to window
-    gtk_container_add(GTK_CONTAINER(window), vbox);
-    gtk_widget_show_all(window);
-}
+//     //add vbox to window
+//     gtk_container_add(GTK_CONTAINER(window), vbox);
+//     gtk_widget_show_all(window);
+// }
 
 void sickClicked(GtkWidget *widget, gpointer data){
     GtkWidget *window;
@@ -398,7 +399,7 @@ int main(int argc, char *argv[]){
 
     //cash button
     cash_button = gtk_button_new_with_label("Data Kas/Cashflow");
-    g_signal_connect(cash_button, "clicked", G_CALLBACK(cashflowClicked), );
+    g_signal_connect(cash_button, "clicked", G_CALLBACK(cashflowClicked), kunjunganHead);
 
     //sick button
     sick_button = gtk_button_new_with_label("Data Penyakit");

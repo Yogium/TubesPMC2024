@@ -1,6 +1,7 @@
 #include <gtk/gtk.h>
 #include <string.h>
 #include <stdio.h>
+#include "gui_commonfunc.h"
 
 #ifndef GUI_PASIEN_H
 
@@ -18,11 +19,6 @@ enum patientColumns{
 void getTextInput(GtkWidget *entry, gpointer data){
     const gchar *text = gtk_entry_get_text(GTK_ENTRY(entry));
 }
-
-void closeWindow(GtkWidget *widget, gpointer window){
-    gtk_widget_destroy(GTK_WIDGET(window));
-}
-
 #endif
 
 
