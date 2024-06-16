@@ -15,6 +15,7 @@
 #include "visit_manipulate.c"
 #include "cashflow.c"
 #include "controlPatient.c"
+#include "penyakit.c"
 
 int main() {
     DataPasien* pasienHead = NULL;
@@ -78,6 +79,9 @@ int main() {
                 break;
             case 10:
                 findPatientsByControlDate(pasienHead, kunjunganHead, inputControlDate());
+                break;
+            case 11:
+                ListPenyakit* returnlist = sorter(kunjunganHead);
                 break;
             case 0:
                 exit(0);

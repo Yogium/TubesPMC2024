@@ -31,7 +31,7 @@ ctrlist* findPatientsByControlDate(DataPasien* pasienHead, DataKunjungan* kunjun
             kunjunganTemp->control.month == controlDate.month &&
             kunjunganTemp->control.year == controlDate.year) {
                 found = 1;
-                printf("ID Pasien: %s\n", kunjunganTemp->patientID); 
+                //printf("ID Pasien: %s\n", kunjunganTemp->patientID); 
                 if(ctrlistHead == NULL) {
                     ctrlistHead = (ctrlist*)malloc(sizeof(ctrlist));
                     strcpy(ctrlistHead->patientID, kunjunganTemp->patientID);
@@ -67,6 +67,7 @@ ctrlist* findPatientsByControlDate(DataPasien* pasienHead, DataKunjungan* kunjun
     if (!found) {
         printf("Tidak ada pasien yang kontrol pada tanggal tersebut.\n");
     }
+    
     return ctrlistHead;
 }
 
