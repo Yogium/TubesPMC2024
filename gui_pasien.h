@@ -16,9 +16,7 @@ enum patientColumns{
 };
 
 void getTextInput(GtkWidget *entry, gpointer data){
-    entryString *es = (entryString *)data;
     const gchar *text = gtk_entry_get_text(GTK_ENTRY(entry));
-    strcpy(es->string, text);
 }
 
 void closeWindow(GtkWidget *widget, gpointer window){
@@ -61,7 +59,7 @@ void addPatientClicked(GtkWidget *widget){
 
     //create label address
     entry_address = gtk_entry_new();
-    gtk_entry_set_placeholder_text(GTK_ENTRY(entry_address)"Alamat Pasien");
+    gtk_entry_set_placeholder_text(GTK_ENTRY(entry_address), "Alamat Pasien");
 
     //create label city
     entry_city = gtk_entry_new();
@@ -93,13 +91,13 @@ void addPatientClicked(GtkWidget *widget){
 
     //pack all widget
     gtk_box_pack_start(GTK_BOX(vbox), label_general, TRUE, TRUE, 0);
-    gtk_box_pack_start(GTK_BOX(vbox), entry_name->entry, TRUE, TRUE, 0);
-    gtk_box_pack_start(GTK_BOX(vbox), entry_address->entry, TRUE, TRUE, 0);
-    gtk_box_pack_start(GTK_BOX(vbox), entry_city->entry, TRUE, TRUE, 0);
-    gtk_box_pack_start(GTK_BOX(vbox), entry_birthdate->entry, TRUE, TRUE, 0);
-    gtk_box_pack_start(GTK_BOX(vbox), entry_age->entry, TRUE, TRUE, 0);
-    gtk_box_pack_start(GTK_BOX(vbox), entry_bpjs->entry, TRUE, TRUE, 0);
-    gtk_box_pack_start(GTK_BOX(vbox), entry_PID->entry, TRUE, TRUE, 0);
+    gtk_box_pack_start(GTK_BOX(vbox), entry_name, TRUE, TRUE, 0);
+    gtk_box_pack_start(GTK_BOX(vbox), entry_address, TRUE, TRUE, 0);
+    gtk_box_pack_start(GTK_BOX(vbox), entry_city, TRUE, TRUE, 0);
+    gtk_box_pack_start(GTK_BOX(vbox), entry_birthdate, TRUE, TRUE, 0);
+    gtk_box_pack_start(GTK_BOX(vbox), entry_age, TRUE, TRUE, 0);
+    gtk_box_pack_start(GTK_BOX(vbox), entry_bpjs, TRUE, TRUE, 0);
+    gtk_box_pack_start(GTK_BOX(vbox), entry_PID, TRUE, TRUE, 0);
     gtk_box_pack_start(GTK_BOX(vbox), button_save, TRUE, TRUE, 0);
     gtk_box_pack_start(GTK_BOX(vbox), button_cancel, TRUE, TRUE, 0);
 
@@ -217,7 +215,7 @@ void editPatientClicked(GtkWidget *widget){
 void delPatientClicked(GtkWidget *widget){
     GtkWidget *window;
     GtkWidget *vbox;
-    entryString *entryChoice = malloc(sizeof(entryString));
+    GtkWidget *entryChoice;
     GtkWidget *buttonExit;/*button untuk membatalkan penghapusan data pasien*/
 
     //create window
@@ -229,17 +227,16 @@ void delPatientClicked(GtkWidget *widget){
     vbox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
 
     //create entry choice
-    entryChoice->entry = gtk_entry_new();
-    entryChoice->string = malloc(11*sizeof(char));
-    gtk_entry_set_placeholder_text(GTK_ENTRY(entryChoice->entry), "Masukkan ID pasien yang ingin dihapus");
-    g_signal_connect(entryChoice->entry, "activate", G_CALLBACK(getTextInput), entryChoice);
+    entryChoice = gtk_entry_new();
+    gtk_entry_set_placeholder_text(GTK_ENTRY(entryChoice), "Masukkan ID pasien yang ingin dihapus");
+    g_signal_connect(entryChoice, "activate", G_CALLBACK(getTextInput), entryChoice);
 
     //create exit button
     buttonExit = gtk_button_new_with_label("Batal");
     g_signal_connect(buttonExit, "clicked", G_CALLBACK(closeWindow), window);
 
     //pack all widget
-    gtk_box_pack_start(GTK_BOX(vbox), entryChoice->entry, TRUE, TRUE, 0);
+    gtk_box_pack_start(GTK_BOX(vbox), entryChoice, TRUE, TRUE, 0);
     gtk_box_pack_start(GTK_BOX(vbox), buttonExit, TRUE, TRUE, 0);
 
     gtk_container_add(GTK_CONTAINER(window), vbox);

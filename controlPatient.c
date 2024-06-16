@@ -2,7 +2,7 @@
     Nama file : controlPatient.c
     Deskripsi : Fungsi untuk mencari pasien-pasien yang akan kontrol pada tanggal yang diinput
 */
-
+//edited by: 13222050
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -16,65 +16,58 @@ typedef struct ctrlist{
     struct ctrlist* next;
 } ctrlist;
 
+date inputControlDate(char *stringDate);
+
 // Fungsi untuk mencari pasien berdasarkan tanggal kontrol
-ctrlist* findPatientsByControlDate(DataPasien* pasienHead, DataKunjungan* kunjunganHead, date controlDate) {
+ctrlist* findPatientsByControlDate(DataPasien* pasienHead, DataKunjungan* kunjunganHead, char *stringDate) {
     DataKunjungan* kunjunganTemp = kunjunganHead;
     DataPasien* pasienTemp = pasienHead;
-    int found = 0;
+    date controlDate = inputControlDate(stringDate);
 
-    printf("\nPasien yang kontrol pada tanggal %d %d %d:\n", controlDate.date, controlDate.month, controlDate.year);
-
-    ctrlist* ctrlistHead = NULL;
-
-    while (kunjunganTemp != NULL) {
-        if (kunjunganTemp->control.date == controlDate.date &&
-            kunjunganTemp->control.month == controlDate.month &&
-            kunjunganTemp->control.year == controlDate.year) {
-                found = 1;
-                printf("ID Pasien: %s\n", kunjunganTemp->patientID); 
-                if(ctrlistHead == NULL) {
-                    ctrlistHead = (ctrlist*)malloc(sizeof(ctrlist));
-                    strcpy(ctrlistHead->patientID, kunjunganTemp->patientID);
-                    ctrlistHead->next = NULL;
-                } else {
-                    ctrlist* ctrlistTemp = ctrlistHead;
-                    while(ctrlistTemp->next != NULL) {
-                        ctrlistTemp = ctrlistTemp->next;
+    ctrlist* listhead = NULL;
+    while(kunjunganTemp != NULL){
+        if(kunjunganTemp->control.date == controlDate.date && kunjunganTemp->control.month == controlDate.month && kunjunganTemp->control.year == controlDate.year){
+            DataPasien* pasienTemp = pasienHead;
+            while(pasienTemp != NULL){
+                if(strcmp(pasienTemp->patientID, kunjunganTemp->patientID) == 0){
+                    ctrlist* newnode = (ctrlist*)malloc(sizeof(ctrlist));
+                    strcpy(newnode->nama, pasienTemp->nama);
+                    strcpy(newnode->patientID, pasienTemp->patientID);
+                    newnode->next = NULL;
+                    if(listhead == NULL){
+                        listhead = newnode;
                     }
-                    ctrlist* new = (ctrlist*)malloc(sizeof(ctrlist));
-                    strcpy(new->patientID, kunjunganTemp->patientID);
-                    new->next = NULL;
-
-                    ctrlistTemp->next = new;
+                    else{
+                        ctrlist* temp = listhead;
+                        while(temp->next != NULL){
+                            temp = temp->next;
+                        }
+                        temp->next = newnode;
+                    }
                 }
-
-            }
-            return ctrlistHead;
-    }
-
-    // Cari nama pasien
-    while(ctrlistHead != NULL) {
-        while(ctrlistHead->nama[0] == '\0'){
-            if(strcmp(ctrlistHead->patientID, pasienTemp->patientID) == 0){
-                strcpy(ctrlistHead->nama, pasienTemp->nama);
-                pasienTemp = pasienHead;//rewind temp
-                break;
-            }else{
                 pasienTemp = pasienTemp->next;
             }
         }
+        kunjunganTemp = kunjunganTemp->next;
     }
-    if (!found) {
-        printf("Tidak ada pasien yang kontrol pada tanggal tersebut.\n");
-    }
-    return ctrlistHead;
+    return listhead;
+
 }
 
 // Fungsi untuk input tanggal dari pengguna
-date inputControlDate() {
+date inputControlDate(char *stringDate) {
     date controlDate;
-    printf("Masukkan tanggal kontrol (dd mm yyyy): ");
-    scanf("%d %d %d", &controlDate.date, &controlDate.month, &controlDate.year);
+    char *token = strtok(stringDate, "/");
+    if(token != NULL){
+        controlDate.date = atoi(token);
+        token = strtok(NULL, "/");
+        controlDate.month = atoi(token);
+        token = strtok(NULL, "/");
+        controlDate.year = atoi(token);
+    }
+
+    //printf("Masukkan tanggal kontrol (dd mm yyyy): ");
+    //scanf("%d %d %d", &controlDate.date, &controlDate.month, &controlDate.year);
 
     return controlDate;
 }

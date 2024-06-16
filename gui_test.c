@@ -1,5 +1,8 @@
 #include <gtk/gtk.h>
 #include <string.h>
+#include "struct.h"
+#include "LinkedList.h"
+
 
 static int count = 0;
 static GtkWidget *label;
@@ -62,6 +65,11 @@ int main(int argc, char *argv[]){
     GtkWidget *entry;
     GtkWidget *entry2;
     GtkWidget *saveButton;
+
+    DataKunjungan *kunjunganHead = NULL;
+    DataPasien *pasienHead = NULL;
+    parseDataKunjunganFromFile("Riwayat_Datang.csv", &kunjunganHead);
+    parseDataPasienFromFile("Data_Pasien.csv", &pasienHead);
 
 
     gtk_init(&argc, &argv);

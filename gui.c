@@ -1,6 +1,9 @@
 #include <gtk/gtk.h>
 #include <string.h>
+#include "struct.h"
+#include "LinkedList.h"
 #include "gui_pasien.h"
+#include "controlPatient.c"
 
 enum controlColumns {
     COL_PATIENT_ID,
@@ -20,12 +23,24 @@ enum diagColumns {
     DIAG_N_COLUMNS
 };
 
+struct controlStruct{
+    GtkWidget *entryDate;
+    DataKunjungan *kunjungan;
+    DataPasien *pasien;
+    GtkListStore *controlList;
+};
+
+struct generalLL{
+    DataKunjungan *kunjungan;
+    DataPasien *pasien;
+};
+
 
 void closewindow(GtkWidget *widget, gpointer window){
     gtk_widget_destroy(GTK_WIDGET(window));
 }
 
-void patient_clicked(GtkWidget *widget){
+void patient_clicked(GtkWidget *widget, gpointer data){
     GtkWidget *window;
     GtkWidget *vbox;
     GtkWidget *add_button;
@@ -73,7 +88,7 @@ void patient_clicked(GtkWidget *widget){
     gtk_widget_show_all(window);
 }
 
-void visitClicked(GtkWidget *widget){
+void visitClicked(GtkWidget *widget, gpointer data){
     GtkWidget *window;
     GtkWidget *vbox;
     GtkWidget *add_button;
@@ -121,17 +136,44 @@ void visitClicked(GtkWidget *widget){
     gtk_widget_show_all(window);   
 }
 
-void controlClicked(GtkWidget *widget){
+void controlSearchClicked(GtkWidget *widget, gpointer data){
+    DataPasien *pasien = ((struct controlStruct*)data)->pasien;
+    DataKunjungan *kunjungan = ((struct controlStruct*)data)->kunjungan;
+    GtkWidget *entryDate = ((struct controlStruct*)data)->entryDate;
+    const char *date = gtk_entry_get_text(GTK_ENTRY(entryDate));
+    char *dateCopy = malloc(strlen(date) + 1);
+    dateCopy = strcpy(dateCopy, date);
+    ctrlist *controlLLHead = NULL;
+    controlLLHead = findPatientsByControlDate(pasien, kunjungan, dateCopy);
+    ctrlist *temp = controlLLHead;
+    GtkListStore *controlList = (((struct controlStruct*)data)->controlList);
+    GtkTreeIter iter;
+    if(controlLLHead == NULL){
+        return;
+    }
+    while(temp != NULL){
+        gtk_list_store_insert_with_values(controlList, &iter, -1, COL_PATIENT_ID, temp->patientID, COL_PATIENT_NAME, temp->nama, -1);
+        temp = temp->next;
+    }
+}
+
+
+void controlClicked(GtkWidget *widget, gpointer data){
     GtkWidget *window;
     GtkWidget *vbox;
-    GtkWidget *entry;
     GtkWidget *exitButton;
     GtkListStore *controlList;
     GtkTreeViewColumn *column;
+    GtkWidget *searchButton;
     GtkWidget *view;
     GtkWidget *label;
 
+    //declare the head for LL
+    struct controlStruct *controlData = malloc(sizeof(struct controlStruct));
+    controlData->kunjungan = ((struct generalLL*)data)->kunjungan;
+    controlData->pasien = ((struct generalLL*)data)->pasien; 
 
+    //create list
     controlList = gtk_list_store_new(CONTROL_N_COLUMNS, G_TYPE_STRING, G_TYPE_STRING);
     view = gtk_tree_view_new_with_model(GTK_TREE_MODEL(controlList));
 
@@ -141,9 +183,10 @@ void controlClicked(GtkWidget *widget){
     column = gtk_tree_view_column_new_with_attributes("Patient Name", gtk_cell_renderer_text_new(), "text", COL_PATIENT_NAME, NULL);
     gtk_tree_view_append_column(GTK_TREE_VIEW(view), column);
 
+    controlData->controlList = controlList;
 
     //create label
-    label = gtk_label_new("Masukkan Tanggal dalam Format dd mm yyyy");
+    label = gtk_label_new("Masukkan Tanggal dalam Format dd/mm/yyyy");
 
     //create window
     window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
@@ -154,8 +197,12 @@ void controlClicked(GtkWidget *widget){
     vbox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
 
     //create entry
-    entry = gtk_entry_new();
-    gtk_entry_set_text(GTK_ENTRY(entry), NULL);
+    controlData->entryDate = gtk_entry_new();
+    //g_signal_connect(controlData->entryDate, "activate", G_CALLBACK(controlSearchClicked), controlData);
+
+    //create search button
+    searchButton = gtk_button_new_with_label("Search");
+    g_signal_connect(searchButton, "clicked", G_CALLBACK(controlSearchClicked), controlData);
 
     //create exit button
     exitButton = gtk_button_new_with_label("kembali");
@@ -163,8 +210,9 @@ void controlClicked(GtkWidget *widget){
 
     //add entry to vbox
     gtk_box_pack_start(GTK_BOX(vbox), label, TRUE, TRUE, 0);
-    gtk_box_pack_start(GTK_BOX(vbox), entry, TRUE, TRUE, 0);
+    gtk_box_pack_start(GTK_BOX(vbox), controlData->entryDate, TRUE, TRUE, 0);
     gtk_box_pack_start(GTK_BOX(vbox), view, TRUE, TRUE, 0);
+    gtk_box_pack_start(GTK_BOX(vbox), searchButton, TRUE, TRUE, 0);
     gtk_box_pack_start(GTK_BOX(vbox), exitButton, TRUE, TRUE, 0);
 
     //add vbox to window
@@ -173,7 +221,7 @@ void controlClicked(GtkWidget *widget){
     
 }
 
-void diagClicked(GtkWidget *widget){
+void diagClicked(GtkWidget *widget, gpointer data){
     GtkWidget *window;
     GtkWidget *vbox;
     GtkWidget *entry_PID;/*masukkan PID*/
@@ -229,7 +277,7 @@ void diagClicked(GtkWidget *widget){
     gtk_widget_show_all(window);
 }
 
-void cashflowClicked(GtkWidget *widget){
+void cashflowClicked(GtkWidget *widget, gpointer data){
     GtkWidget *window;
     GtkWidget *vbox;
     GtkWidget *exitButton;
@@ -277,7 +325,7 @@ void cashflowClicked(GtkWidget *widget){
     gtk_widget_show_all(window);
 }
 
-void sickClicked(GtkWidget *widget){
+void sickClicked(GtkWidget *widget, gpointer data){
     GtkWidget *window;
     GtkListStore *sickList;
     GtkTreeViewColumn *column;
@@ -313,6 +361,13 @@ int main(int argc, char *argv[]){
     GtkWidget *sick_button;
     GtkWidget *diag_button; /*tombol untuk riwayat sakit pasien*/
     
+    //initialize linkedlist
+    DataPasien* pasienHead = NULL;
+    DataKunjungan* kunjunganHead = NULL;
+    parseDataPasienFromFile("Data_Pasien.csv", &pasienHead);
+    parseDataKunjunganFromFile("Riwayat_Datang.csv", &kunjunganHead);
+    struct generalLL LL = {kunjunganHead, pasienHead};
+
     // initialize gtk
     gtk_init(&argc, &argv);
 
@@ -326,16 +381,16 @@ int main(int argc, char *argv[]){
 
     //patient button
     patient_button = gtk_button_new_with_label("Data Pasien");
-    g_signal_connect(patient_button, "clicked", G_CALLBACK(patient_clicked), NULL);
+    g_signal_connect(patient_button, "clicked", G_CALLBACK(patient_clicked), &LL);
 
 
     //visit button  
     visit_button = gtk_button_new_with_label("Data Kunjungan");
-    g_signal_connect(visit_button, "clicked", G_CALLBACK(visitClicked), NULL);
+    g_signal_connect(visit_button, "clicked", G_CALLBACK(visitClicked), &LL);
 
     //control button
     control_button = gtk_button_new_with_label("Data Kontrol");
-    g_signal_connect(control_button, "clicked", G_CALLBACK(controlClicked), NULL);
+    g_signal_connect(control_button, "clicked", G_CALLBACK(controlClicked), &LL);
 
     //diagnosis button
     diag_button = gtk_button_new_with_label("Riwayat Sakit Pasien");
@@ -343,7 +398,7 @@ int main(int argc, char *argv[]){
 
     //cash button
     cash_button = gtk_button_new_with_label("Data Kas/Cashflow");
-    g_signal_connect(cash_button, "clicked", G_CALLBACK(cashflowClicked), NULL);
+    g_signal_connect(cash_button, "clicked", G_CALLBACK(cashflowClicked), );
 
     //sick button
     sick_button = gtk_button_new_with_label("Data Penyakit");
