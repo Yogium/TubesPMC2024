@@ -44,6 +44,8 @@ int main() {
         printf("7. Hapus Kunjungan\n");
         printf("8. Modifikasi Kunjungan\n");
         printf("9. Cari Kunjungan\n");
+        printf("10. Cari Pasien berdasarkan tanggal kontrol\n");
+        printf("11. Sort penyakit\n");
         printf("0. Keluar\n");
         printf("Pilihan: ");
         scanf("%d", &choice);
