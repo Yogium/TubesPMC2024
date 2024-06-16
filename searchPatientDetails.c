@@ -7,16 +7,11 @@
 #include <ctype.h>
 #include "struct.h"
 
-void searchPatientDetails(DataPasien* pasienHead, DataKunjungan* kunjunganHead) {
-    char patientID[11];
+void searchPatientDetails(DataPasien* pasienHead, DataKunjungan* kunjunganHead, char* patientID) {
     DataPasien* tempPasien = pasienHead;
     DataKunjungan* tempKunjungan = kunjunganHead;
     int foundPasien = 0;
     int foundKunjungan = 0;
-
-    printf("Masukkan ID pasien untuk mencari: ");
-    fgets(patientID, sizeof(patientID), stdin);
-    patientID[strcspn(patientID, "\n")] = '\0';
 
     // Search for patient details in the DataPasien list
     while (tempPasien != NULL) {
@@ -51,9 +46,15 @@ void searchPatientDetails(DataPasien* pasienHead, DataKunjungan* kunjunganHead) 
     }
 }
 
-int main(){
+int main() {
     DataPasien* pasienHead = NULL;
     DataKunjungan* kunjunganHead = NULL;
-    searchPatientDetails(pasienHead, kunjunganHead);
+    char pasienID[11];
+
+    printf("Masukkan ID pasien untuk mencari: ");
+    fgets(pasienID, sizeof(pasienID), stdin);
+    pasienID[strcspn(pasienID, "\n")] = '\0';
+
+    searchPatientDetails(pasienHead, kunjunganHead, pasienID);
     return 0;
 }
