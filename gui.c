@@ -6,6 +6,7 @@
 #include "controlPatient.c"
 #include "gui_cashflow.h"
 #include "gui_commonfunc.h"
+#include "gui_sick.h"
 
 enum controlColumns {
     COL_PATIENT_ID,
@@ -22,6 +23,7 @@ enum sickColumns {
 enum diagColumns {
     COL_DIAG_NAME,
     COL_DIAG_TINDAKAN,
+    COL_DIAG_DATE,
     DIAG_N_COLUMNS
 };
 
@@ -253,13 +255,16 @@ void diagClicked(GtkWidget *widget, gpointer data){
     gtk_entry_set_placeholder_text(GTK_ENTRY(entry_PID), "Masukkan Patient ID");
 
     //create list
-    diagList = gtk_list_store_new(DIAG_N_COLUMNS, G_TYPE_STRING, G_TYPE_STRING);
+    diagList = gtk_list_store_new(DIAG_N_COLUMNS, G_TYPE_STRING, G_TYPE_STRING, G_TYPE_STRING);
     view = gtk_tree_view_new_with_model(GTK_TREE_MODEL(diagList));
 
     column = gtk_tree_view_column_new_with_attributes("Diagnosis", gtk_cell_renderer_text_new(), "text", COL_DIAG_NAME, NULL);
     gtk_tree_view_append_column(GTK_TREE_VIEW(view), column);
 
     column = gtk_tree_view_column_new_with_attributes("Tindakan", gtk_cell_renderer_text_new(), "text", COL_DIAG_TINDAKAN, NULL);
+    gtk_tree_view_append_column(GTK_TREE_VIEW(view), column);
+
+    column = gtk_tree_view_column_new_with_attributes("Tanggal Control", gtk_cell_renderer_text_new(), "text", COL_DIAG_DATE, NULL);
     gtk_tree_view_append_column(GTK_TREE_VIEW(view), column);
 
     //create exit button
@@ -347,6 +352,8 @@ void sickClicked(GtkWidget *widget, gpointer data){
 
     //create month button
     monthButton = gtk_button_new_with_label("Lihat Data Penyakit per Bulan");
+    g_signal_connect(monthButton, "clicked", G_CALLBACK(sickMonthPressed), data);
+
 
     //create exit button
 
