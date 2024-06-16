@@ -46,6 +46,8 @@ int main() {
         printf("9. Cari Kunjungan\n");
         printf("10. Cari Pasien berdasarkan tanggal kontrol\n");
         printf("11. Sort penyakit\n");
+        printf("12. Sort penyakit berdasarkan bulan dan tahun\n");
+        printf("13. Sort penyakit berdasarkan tahun\n");
         printf("0. Keluar\n");
         printf("Pilihan: ");
         scanf("%d", &choice);
@@ -83,7 +85,20 @@ int main() {
                 findPatientsByControlDate(pasienHead, kunjunganHead, inputControlDate());
                 break;
             case 11:
-                ListPenyakit* returnlist = sorter(kunjunganHead);
+                ListPenyakit* returnlist = diagsorter(kunjunganHead);
+                break;
+            case 12:
+                printf("Masukan bulan dan tahun: (MM YYYY): ");
+                int tempmonth, tempyear;
+                scanf("%d %d", &tempmonth, &tempyear);
+                ListPenyakit* returnlistmonth = diagbymonth(kunjunganHead, tempmonth, tempyear);
+                break;
+            case 13:
+                printf("Masukan tahun: (YYYY): ");
+                int tempyear2;
+                scanf("%d", &tempyear2);
+                ListPenyakit* returnlistyear = diagbyyear(kunjunganHead, tempyear);
+                ;
                 break;
             case 0:
                 exit(0);
