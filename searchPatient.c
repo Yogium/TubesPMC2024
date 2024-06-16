@@ -28,13 +28,13 @@ void searchPatient(DataPasien* head, const char* input) {
                 printf("BPJS: %s\n", temp->BPJS);
                 printf("Patient ID: %s\n", temp->patientID);
                 printf("\n");
-                found = 1;
+                found = 1; //Berarti found
                 break;
             }
             temp = temp->next;
         }
 
-        if (!found) {
+        if (!found) { //Bila not found
             printf("Pasien dengan ID '%s' tidak ditemukan.\n", input);
         }
     } else {
@@ -51,12 +51,12 @@ void searchPatient(DataPasien* head, const char* input) {
                 printf("BPJS: %s\n", temp->BPJS);
                 printf("Patient ID: %s\n", temp->patientID);
                 printf("\n");
-                found = 1;
+                found = 1; // Berarti found
             }
             temp = temp->next;
         }
 
-        if (!found) {
+        if (!found) { //Bila not found
             printf("Pasien dengan nama '%s' tidak ditemukan.\n", input);
         }
     }
