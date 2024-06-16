@@ -8,70 +8,86 @@
 #include "struct.h"
 #include "parsingDate.c"
 
-void addPatient(DataPasien** head) {
+//parameters sbg input
+void addPatient(DataPasien** head, char* nama, char* alamat, char* kota, char* tempatLahir, char* tglLahir, int umur, char* BPJS, char* patientID) {
     DataPasien* newNode = createDataPasienNode();
-    printf("Masukkan data pasien:\n");
-
     DataPasien* temp = *head;
+
     while (temp != NULL && temp->next != NULL) {
         temp = temp->next;
     }
 
-    // Ini buat automatically assign index ke last index + 1
     if (temp != NULL) {
-        newNode->index = temp->index + 1; // tambah 1 indexnya
-    } else {
-        newNode->index = 1; // Kalo linked list kosong, index =1
+        newNode->index = temp->index + 1; // Dimasukkan ke index + 1
+    } 
+    else {
+        newNode->index = 1; // Bila linked list kosong, index = 1
     }
 
-    printf("Nama: ");
-    scanf(" %[^\n]", newNode->nama);
+    strcpy(newNode->nama, nama);
+    strcpy(newNode->alamat, alamat);
+    strcpy(newNode->kota, kota);
+    strcpy(newNode->tempatLahir, tempatLahir);
 
-    printf("Alamat: ");
-    scanf(" %[^\n]", newNode->alamat);
-
-    printf("Kota: ");
-    scanf(" %[^\n]", newNode->kota);
-
-    printf("Tempat Lahir: ");
-    scanf(" %[^\n]", newNode->tempatLahir);
-
-    int day, year;
-    char monthName[20];
-    int validDate = 0;
-    while (!validDate) { // Loop sampai tanggal valid date
-        printf("Tanggal Lahir (dd NamaBulan yyyy): ");
-        scanf("%d %s %d", &day, monthName, &year);
-
-        // Bulan jadi integer
-        int month = getMonthNumber(monthName);
-        if (month > 0 && day > 0 && year > 0) {
-            newNode->tgllahir.date = day;
-            newNode->tgllahir.month = month;
-            newNode->tgllahir.year = year;
-            validDate = 1; // Loop keluar kalo valid
-        } else {
-            printf("Invalid. Masukkan ulang.\n");
-            while (getchar() != '\n');
-        }
+    char originalDate[20]; // Buffer untuk menyimpan tanggal yang sudah diformat
+    newNode->tgllahir = parseDate(tglLahir, originalDate); // Memanggil parseDate untuk mendapatkan tanggal yang sudah diformat
+    if (newNode->tgllahir.date == 0 || newNode->tgllahir.month == 0 || newNode->tgllahir.year == 0) {
+        printf("Invalid date format.\n");
+        free(newNode);
+        return;
     }
 
-    printf("Umur: ");
-    scanf("%d", &newNode->umur);
+    newNode->umur = umur;
+    strcpy(newNode->BPJS, BPJS);
+    strcpy(newNode->patientID, patientID);
 
-    printf("BPJS: ");
-    scanf("%s", newNode->BPJS);
-
-    printf("Patient ID: ");
-    scanf("%s", newNode->patientID);
-
-    // Add pasien baru
+    // Add the new patient node
     insertDataPasienAtEnd(head, newNode);
 
     printf("Pasien berhasil ditambahkan!\n");
 }
 
-int main(){
+int main() {
     DataPasien* pasienHead = NULL;
-    addPatient(&pasienHead);
+
+
+    char nama[50];
+    char alamat[100];
+    char kota[20];
+    char tempatLahir[20];
+    char tglLahir[20];
+    int umur;
+    char BPJS[20];
+    char patientID[20];
+
+    printf("Masukkan data pasien:\n");
+
+    printf("Nama: ");
+    scanf(" %[^\n]", nama);
+
+    printf("Alamat: ");
+    scanf(" %[^\n]", alamat);
+
+    printf("Kota: ");
+    scanf(" %[^\n]", kota);
+
+    printf("Tempat Lahir: ");
+    scanf(" %[^\n]", tempatLahir);
+
+    printf("Tanggal Lahir (dd NamaBulan yyyy): ");
+    scanf(" %[^\n]", tglLahir);
+
+    printf("Umur: ");
+    scanf("%d", &umur);
+    while (getchar() != '\n');
+
+    printf("BPJS: ");
+    scanf(" %[^\n]", BPJS);
+
+    printf("Patient ID: ");
+    scanf(" %[^\n]", patientID);
+
+    addPatient(&pasienHead, nama, alamat, kota, tempatLahir, tglLahir, umur, BPJS, patientID);
+
+    return 0;
 }
