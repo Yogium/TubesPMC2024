@@ -5,6 +5,7 @@
 #include "modifyPatient.c"
 #include <stdlib.h>
 #include "searchPatient.c"
+#include "deletePatient.c"
 
 #ifndef GUI_PASIEN_H
 
@@ -338,12 +339,44 @@ void editPatientClicked(GtkWidget *widget, gpointer data){
     gtk_widget_show_all(window);
 }
 
-void delPatientClicked(GtkWidget *widget){
+struct deletePatientData{
+    GtkWidget *labelConfirm;
+    DataPasien *pasien;
+    GtkWidget *entryChoice;
+};
+
+void delPatientActive(GtkWidget *widget, gpointer data){
+    DataPasien *pasien = ((struct deletePatientData*)data)->pasien;
+    const gchar *input = gtk_entry_get_text(GTK_ENTRY(((struct deletePatientData*)data)->entryChoice));
+    char searchID[20];
+    strcpy(searchID, input); 
+    int deleted = deletePatient(&pasien, searchID);
+    if(deleted == 0){
+        gtk_label_set_text(GTK_LABEL(((struct deletePatientData*)data)->labelConfirm), "Data tidak ditemukan");
+    }
+    else{
+        char confirm[50];
+        sprintf(confirm, "Data dengan ID %s berhasil dihapus", searchID);
+        gtk_label_set_text(GTK_LABEL(((struct deletePatientData*)data)->labelConfirm), confirm);
+    }
+}
+
+void delPatientClicked(GtkWidget *widget, gpointer data){
     GtkWidget *window;
     GtkWidget *vbox;
+    GtkWidget *Label;
+    GtkWidget *LabelConfirm;
     GtkWidget *entryChoice;
     GtkWidget *buttonExit;/*button untuk membatalkan penghapusan data pasien*/
 
+    DataPasien *pasien = (DataPasien*)data;
+    struct deletePatientData *delData = malloc(sizeof(struct deletePatientData));
+    delData->pasien = pasien;
+    //create Label
+    Label = gtk_label_new("Masukkan ID pasien yang ingin dihapus");
+
+    LabelConfirm = gtk_label_new("");
+    delData->labelConfirm = LabelConfirm;
     //create window
     window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
     gtk_window_set_title(GTK_WINDOW(window), "Hapus Data Pasien");
@@ -355,14 +388,17 @@ void delPatientClicked(GtkWidget *widget){
     //create entry choice
     entryChoice = gtk_entry_new();
     gtk_entry_set_placeholder_text(GTK_ENTRY(entryChoice), "Masukkan ID pasien yang ingin dihapus");
-    g_signal_connect(entryChoice, "activate", G_CALLBACK(getTextInput), entryChoice);
+    delData->entryChoice = entryChoice;
+    g_signal_connect(entryChoice, "activate", G_CALLBACK(delPatientActive), delData);
 
     //create exit button
     buttonExit = gtk_button_new_with_label("Batal");
     g_signal_connect(buttonExit, "clicked", G_CALLBACK(closeWindow), window);
 
     //pack all widget
+    gtk_box_pack_start(GTK_BOX(vbox), Label, TRUE, TRUE, 0);
     gtk_box_pack_start(GTK_BOX(vbox), entryChoice, TRUE, TRUE, 0);
+    gtk_box_pack_start(GTK_BOX(vbox), LabelConfirm, TRUE, TRUE, 0);
     gtk_box_pack_start(GTK_BOX(vbox), buttonExit, TRUE, TRUE, 0);
 
     gtk_container_add(GTK_CONTAINER(window), vbox);

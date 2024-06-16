@@ -9,48 +9,52 @@
 #include "parsingDate.h"
 #include "LinkedList.h"
 
-void deletePatient(DataPasien** head) {
-
-
-    DataPasien* patientHead = NULL;
-    char idToModify[20];
-
-    printf("Masukkan ID pasien yang ingin dihapus: ");
-    fgets(idToModify, sizeof(idToModify), stdin);
-    idToModify[strcspn(idToModify, "\n")] = 0;
-    
-    if (*head == NULL) { //Bila headnya kosong
-        printf("The list is empty.\n");
-        return;
+int deletePatient(DataPasien** head, char* patientID) {
+    if (*head == NULL) { // Bila linkedlist kosong
+        printf("Linked list kosong.\n");
+        return 0;
     }
 
     DataPasien* temp = *head;
     DataPasien* prev = NULL;
 
-    // Jika head node yang harus dihapus
-    if (strcmp(temp->patientID, idToModify) == 0) {
-        *head = temp->next; // Ubah head
-        free(temp); // Bebaskan memori dari node yang dihapus
-        printf("Patient dengan ID %s sudah dihapus.\n", idToModify);
-        return;
-    }
-
-    // Cari node yang harus dihapus
-    while (temp != NULL && strcmp(temp->patientID, idToModify) != 0) {
+    // Cari node yang ingin didelete
+    while (temp != NULL && strcmp(temp->patientID, patientID) != 0) {
         prev = temp;
         temp = temp->next;
     }
 
-    // Jika patientID tidak ditemukan dalam linked list
+    // Bila id tidak ditemukan
     if (temp == NULL) {
-        printf("Pasien dengan ID %s tidak ditemukan.\n", idToModify);
-        return;
+        printf("Pasien dengan ID '%s' tidak ditemukan.\n", patientID);
+        return 0;
     }
 
-    // Hapus node dari linked list
-    prev->next = temp->next;
-    free(temp); // Bebaskan memori dari node yang dihapus
-    printf("Pasien dengan ID %s sudah dihapus.\n", idToModify);
+    DataPasien* current = *head;
+    int newIndex = 1;
+
+    while (current != NULL) {
+        if (current == temp) {
+            // Skip node
+            current = current->next;
+            continue;
+        }
+
+        current->index = newIndex;
+        newIndex++;
+        current = current->next;
+    }
+
+    // Bila didelete head nodenya
+    if (temp == *head) {
+        *head = temp->next; //Jadi next node
+    } else {
+        prev->next = temp->next; // Link node sebelumnya ke temp
+    }
+
+    free(temp);
+    printf("Pasien dengan ID '%s' sudah dihapus.\n", patientID);
+    return 1;
 }
 
 // int main(){
