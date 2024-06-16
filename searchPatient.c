@@ -46,11 +46,8 @@ DataPasien* searchPatient(DataPasien* head, char* input) {
 
     // Cek apakah input dianggap sebagai ID
     if (strlen(input) >= 3 && input[0] == 'K' && input[1] == 'X' && input[2] == ' ') {
-        char searchID[11];
-        sscanf(input, "%s", searchID); // Baca string pertama sebagai ID
-
         while (temp != NULL) {
-            if (strcmp(temp->patientID, searchID) == 0) {
+            if (strcmp(temp->patientID, input) == 0) {
                 DataPasien* foundPatient = createNodePasien(temp->index, temp->nama, temp->alamat, temp->kota, temp->tempatLahir, temp->tgllahir, temp->umur, temp->BPJS, temp->patientID);
                 addToLL(&foundPatientHead, foundPatient);
                 found = 1;
@@ -59,7 +56,7 @@ DataPasien* searchPatient(DataPasien* head, char* input) {
         }
 
         if (!found) {
-            printf("Pasien dengan ID '%s' tidak ditemukan.\n", searchID);
+            printf("Pasien dengan ID '%s' tidak ditemukan.\n", input);
         }
     } else {
         // Input dianggap sebagai nama
