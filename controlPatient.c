@@ -1,81 +1,85 @@
-/*  Nama      : Nusaiba El Qonitat
+/*  Nama      : Kennard Benaya Manli
     Nama file : controlPatient.c
     Deskripsi : Fungsi untuk mencari pasien-pasien yang akan kontrol pada tanggal yang diinput
 */
-
+//edited by: 13222050
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <ctype.h>
 #include "struct.h"
-#include "LinkedList.c"
+#include "LinkedList.h"
+
+typedef struct ctrlist{
+    char nama[100];
+    char patientID[11];
+    struct ctrlist* next;
+} ctrlist;
+
+date inputControlDate(char *stringDate);
 
 // Fungsi untuk mencari pasien berdasarkan tanggal kontrol
-void findPatientsByControlDate(DataPasien* pasienHead, DataKunjungan* kunjunganHead, date controlDate, char* original) {
+ctrlist* findPatientsByControlDate(DataPasien* pasienHead, DataKunjungan* kunjunganHead, char *stringDate) {
     DataKunjungan* kunjunganTemp = kunjunganHead;
-    int found = 0;
+    DataPasien* pasienTemp = pasienHead;
+    date controlDate = inputControlDate(stringDate);
 
-    printf("\nPasien yang kontrol pada tanggal %s:\n", original);
-
-    while (kunjunganTemp != NULL) {
-        if (kunjunganTemp->control.date == controlDate.date &&
-            kunjunganTemp->control.month == controlDate.month &&
-            kunjunganTemp->control.year == controlDate.year) {
-
+    ctrlist* listhead = NULL;
+    while(kunjunganTemp != NULL){
+        if(kunjunganTemp->control.date == controlDate.date && kunjunganTemp->control.month == controlDate.month && kunjunganTemp->control.year == controlDate.year){
             DataPasien* pasienTemp = pasienHead;
-            while (pasienTemp != NULL) {
-                if (strcmp(pasienTemp->patientID, kunjunganTemp->patientID) == 0) {
-                    printf("Nama: %s\n", pasienTemp->nama);
-                    printf("Patient ID: %s\n\n", pasienTemp->patientID);
-                    found = 1;
-                    break;
+            while(pasienTemp != NULL){
+                if(strcmp(pasienTemp->patientID, kunjunganTemp->patientID) == 0){
+                    ctrlist* newnode = (ctrlist*)malloc(sizeof(ctrlist));
+                    strcpy(newnode->nama, pasienTemp->nama);
+                    strcpy(newnode->patientID, pasienTemp->patientID);
+                    newnode->next = NULL;
+                    if(listhead == NULL){
+                        listhead = newnode;
+                    }
+                    else{
+                        ctrlist* temp = listhead;
+                        while(temp->next != NULL){
+                            temp = temp->next;
+                        }
+                        temp->next = newnode;
+                    }
                 }
                 pasienTemp = pasienTemp->next;
             }
         }
         kunjunganTemp = kunjunganTemp->next;
     }
+    return listhead;
 
-    if (!found) {
-        printf("Tidak ada pasien yang kontrol pada tanggal tersebut.\n");
-    }
 }
 
 // Fungsi untuk input tanggal dari pengguna
-date inputControlDate(char* original) {
-    char inputDate[20];
-    printf("Masukkan tanggal kontrol (dd mm yyyy): ");
-    fgets(inputDate, sizeof(inputDate), stdin);
-    inputDate[strcspn(inputDate, "\n")] = '\0';
-
+date inputControlDate(char *stringDate) {
     date controlDate;
-
-    // Mem-parsing tanggal dari string inputDate
-    if (sscanf(inputDate, "%d %d %d", &controlDate.date, &controlDate.month, &controlDate.year) != 3) {
-        fprintf(stderr, "Format tanggal tidak valid. Gunakan format dd mm yyyy.\n");
-        exit(EXIT_FAILURE);
+    char *token = strtok(stringDate, "/");
+    if(token != NULL){
+        controlDate.date = atoi(token);
+        token = strtok(NULL, "/");
+        controlDate.month = atoi(token);
+        token = strtok(NULL, "/");
+        controlDate.year = atoi(token);
     }
 
-    // Melakukan validasi tanggal yang diinput
-    if (controlDate.date < 1 || controlDate.date > 31 || controlDate.month < 1 || controlDate.month > 12 || controlDate.year < 1900) {
-        fprintf(stderr, "Tanggal tidak valid.\n");
-        exit(EXIT_FAILURE);
-    }
-
-    sprintf(original, "%02d-%02d-%04d", controlDate.date, controlDate.month, controlDate.year);
+    //printf("Masukkan tanggal kontrol (dd mm yyyy): ");
+    //scanf("%d %d %d", &controlDate.date, &controlDate.month, &controlDate.year);
 
     return controlDate;
 }
 
 // Fungsi utama program
-int main() {
-    DataPasien* pasienHead = NULL;
-    DataKunjungan* kunjunganHead = NULL;
+// int control() {
+//     DataPasien* pasienHead = NULL;
+//     DataKunjungan* kunjunganHead = NULL;
 
-    // Input tanggal dari pengguna
-    char original[20];
-    date controlDate = inputControlDate(original);
+//     // Input tanggal dari pengguna
+//     date controlDate = inputControlDate();
 
-    // Cari pasien yang kontrol pada tanggal yang diinput
-    findPatientsByControlDate(pasienHead, kunjunganHead, controlDate, original);
-}
+//     // Cari pasien yang kontrol pada tanggal yang diinput
+//     ctrlist* listhead = findPatientsByControlDate(pasienHead, kunjunganHead, controlDate);
+// }

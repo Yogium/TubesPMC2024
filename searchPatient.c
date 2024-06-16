@@ -7,6 +7,8 @@
 #include <string.h>
 #include <ctype.h>
 #include "struct.h"
+#include "parsingDate.h"
+#include "LinkedList.h"
 
 void searchPatient(DataPasien* head, const char* input) {
     DataPasien* temp = head;
@@ -66,14 +68,8 @@ void searchPatient(DataPasien* head, const char* input) {
     }
 }
 
-int main() {
-    DataPasien* pasienHead = NULL;
-    char input[50];
-    printf("Masukkan nama atau ID pasien: ");
-    fgets(input, sizeof(input), stdin);
-    input[strcspn(input, "\n")] = '\0'; // Hilangkan karakter newline jika ada
-
-    searchPatient(pasienHead, input);
-
-    return 0;
-}
+// int main() {
+//     DataPasien* pasienHead = NULL;
+//     searchPatient(pasienHead);
+//     return 0;
+// }

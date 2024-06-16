@@ -6,6 +6,8 @@
 #include <string.h>
 #include <ctype.h>
 #include "struct.h"
+#include "parsingDate.h"
+#include "LinkedList.h"
 #include "parsingDate.c"
 
 //parameters sbg input
@@ -74,8 +76,20 @@ int main() {
     printf("Tempat Lahir: ");
     scanf(" %[^\n]", tempatLahir);
 
-    printf("Tanggal Lahir (dd NamaBulan yyyy): ");
-    scanf(" %[^\n]", tglLahir);
+    char dateString[50];
+    int validDate = 0;
+    while (!validDate) { // Dibikin agar wajibin user masukin tanggal yang valid, kalo ngga di loop nanti programnya error
+        printf("Tanggal Lahir (dd mm yyyy): \n");
+        scanf("%d %d %d", &newNode->tgllahir.date, &newNode->tgllahir.month, &newNode->tgllahir.year);
+
+
+
+        if (newNode->tgllahir.date > 0 && newNode->tgllahir.month > 0 && newNode->tgllahir.year > 0) {
+            validDate = 1; // Jadi 1 and break the loop kalo valid
+        } else {
+            printf("Format tanggal tidak valid. Masukkan ulang.\n");
+        }
+    }
 
     printf("Umur: ");
     scanf("%d", &umur);
@@ -87,6 +101,16 @@ int main() {
     printf("Patient ID: ");
     scanf(" %[^\n]", patientID);
 
+    // Add pasien baru
+    insertDataPasienAtEnd(head, newNode); //fungsi ini pake yang dibuat El di linkedlist.c
+
+    printf("Pasien berhasil ditambahkan!\n");
+}
+
+// int main(){
+//     DataPasien* pasienHead = NULL;
+//     addPatient(&pasienHead);
+// }
     addPatient(&pasienHead, nama, alamat, kota, tempatLahir, tglLahir, umur, BPJS, patientID);
 
     return 0;
