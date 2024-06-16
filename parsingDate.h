@@ -1,6 +1,8 @@
 //Nama : Nicholas Darren
 //Nama file : parsingDate.c
 // Deskripsi : Fungsi ini menerima tanggal yang belom di format menjadi tanggal yang memiliki format yang sama yaitu dd-mm-yyyy
+#ifndef PARSINGDATE_H
+#define PARSINGDATE_H
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -118,47 +120,4 @@ int parseDataFromFile(const char* filename, date** dates, char*** originals, int
     return 1;
 }
 
-int main() {
-    int capacity_pasien = 10;
-    int capacity_riwayat = 10;
-    int dateCount_pasien = 0;
-    int dateCount_riwayat = 0;
-    date* dates_pasien = NULL;
-    date* dates_riwayat = NULL;
-    char** originals_pasien = NULL;
-    char** originals_riwayat = NULL;
-
-    if (!parseDataFromFile("Data_Pasien.csv", &dates_pasien, &originals_pasien, &dateCount_pasien, &capacity_pasien)) {
-        fprintf(stderr, "Failed to parse data from Data_Pasien.csv\n");
-        return EXIT_FAILURE;
-    }
-
-    printf("Dates from Data_Pasien.csv in dd-mm-yyyy format:\n");
-    for (int i = 0; i < dateCount_pasien; i++) {
-        printf("%s\n", originals_pasien[i]);
-    }
-
-    if (!parseDataFromFile("Riwayat_Datang.csv", &dates_riwayat, &originals_riwayat, &dateCount_riwayat, &capacity_riwayat)) {
-        fprintf(stderr, "Failed to parse data from Riwayat_Datang.csv\n");
-        return EXIT_FAILURE;
-    }
-
-    printf("\nDates from Riwayat_Datang.csv in dd-mm-yyyy format:\n");
-    for (int i = 0; i < dateCount_riwayat; i++) {
-        printf("%s\n", originals_riwayat[i]);
-    }
-
-    //Free memori
-    for (int i = 0; i < dateCount_pasien; i++) {
-        free(originals_pasien[i]);
-    }
-    for (int i = 0; i < dateCount_riwayat; i++) {
-        free(originals_riwayat[i]);
-    }
-    free(originals_pasien);
-    free(originals_riwayat);
-    free(dates_pasien);
-    free(dates_riwayat);
-
-    return 0;
-}
+#endif

@@ -6,10 +6,9 @@
 #include <string.h>
 #include <ctype.h>
 #include "struct.h"
-#include "parsingDate.c"
-#include "LinkedList.c"
+#include "parsingDate.h"
+#include "LinkedList.h"
 
-date parseDate(char* dateString, char* original);
 
 void addPatient(DataPasien** head) {
     DataPasien* newNode = createDataPasienNode();
@@ -42,11 +41,11 @@ void addPatient(DataPasien** head) {
     char dateString[50];
     int validDate = 0;
     while (!validDate) { // Dibikin agar wajibin user masukin tanggal yang valid, kalo ngga di loop nanti programnya error
-        printf("Tanggal Lahir (dd mmm yyyy): ");
-        fgets(dateString, sizeof(dateString), stdin);
-        dateString[strcspn(dateString, "\n")] = 0;
-        char original[20];
-        newNode->tgllahir = parseDate(dateString, original);
+        printf("Tanggal Lahir (dd mm yyyy): \n");
+        scanf("%d %d %d", &newNode->tgllahir.date, &newNode->tgllahir.month, &newNode->tgllahir.year);
+
+
+
         if (newNode->tgllahir.date > 0 && newNode->tgllahir.month > 0 && newNode->tgllahir.year > 0) {
             validDate = 1; // Jadi 1 and break the loop kalo valid
         } else {
@@ -69,7 +68,7 @@ void addPatient(DataPasien** head) {
     printf("Pasien berhasil ditambahkan!\n");
 }
 
-int main(){
-    DataPasien* pasienHead = NULL;
-    addPatient(&pasienHead);
-}
+// int main(){
+//     DataPasien* pasienHead = NULL;
+//     addPatient(&pasienHead);
+// }
