@@ -349,6 +349,7 @@ void sickClicked(GtkWidget *widget, gpointer data){
 
     //create year button
     yearButton = gtk_button_new_with_label("Lihat Data Penyakit per Tahun");
+    g_signal_connect(yearButton, "clicked", G_CALLBACK(sickYearPressed), data);
 
     //create month button
     monthButton = gtk_button_new_with_label("Lihat Data Penyakit per Bulan");
