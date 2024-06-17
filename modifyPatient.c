@@ -8,7 +8,7 @@
 #include "struct.h"
 #include "parsingDate.h"
 
-void modifyPatient(DataPasien** head, char* idToModify, char* newNama, char* newAlamat, char* newKota, char* newTempatLahir, char* newTglLahir, int newUmur, char* newBPJS) {
+int modifyPatient(DataPasien** head, char* idToModify, char* newNama, char* newAlamat, char* newKota, char* newTempatLahir, char* newTglLahir, int newUmur, char* newBPJS) {
     DataPasien* temp = *head;
 
     while (temp != NULL && strcmp(temp->patientID, idToModify) != 0) {
@@ -33,7 +33,7 @@ void modifyPatient(DataPasien** head, char* idToModify, char* newNama, char* new
             temp->tgllahir = parseDate(newTglLahir, originalDate);
             if (temp->tgllahir.date == 0 || temp->tgllahir.month == 0 || temp->tgllahir.year == 0) {
                 printf("Invalid date format.\n");
-                return;
+                return 0;
             }
         }
         if (newUmur > 0) {
@@ -43,9 +43,9 @@ void modifyPatient(DataPasien** head, char* idToModify, char* newNama, char* new
             strcpy(temp->BPJS, newBPJS);
         }
 
-        printf("Data pasien berhasil diubah!\n");
+        return 1;
     } else {
-        printf("Pasien dengan ID %s tidak ditemukan.\n", idToModify);
+        return 0;
     }
 }
 

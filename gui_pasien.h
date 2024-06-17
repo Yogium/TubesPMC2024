@@ -7,6 +7,7 @@
 #include "searchPatient.c"
 #include "deletePatient.c"
 #include "addPatient.c"
+#include "parsingDate.h"
 
 #ifndef GUI_PASIEN_H
 
@@ -289,7 +290,7 @@ void searchPatientClicked(GtkWidget *widget, gpointer data){
 }
 
 struct editPatientData{
-    GtkWidget *window;
+    GtkWidget *label;
     DataPasien *pasien;
     GtkWidget *PIDEntry;
     GtkWidget *nameEntry;
@@ -302,7 +303,6 @@ struct editPatientData{
 
 void editPatientSaveClicked(GtkWidget *widget, gpointer data){
     //taking the data from entries
-    GtkWidget *window = ((struct editPatientData*)data)->window;
     DataPasien *pasien = ((struct editPatientData*)data)->pasien;
     const gchar *PID = gtk_entry_get_text(GTK_ENTRY(((struct editPatientData*)data)->PIDEntry));
     const gchar *name = gtk_entry_get_text(GTK_ENTRY(((struct editPatientData*)data)->nameEntry));
@@ -311,6 +311,8 @@ void editPatientSaveClicked(GtkWidget *widget, gpointer data){
     const gchar *birthdate = gtk_entry_get_text(GTK_ENTRY(((struct editPatientData*)data)->birthdateEntry));
     const gchar *age = gtk_entry_get_text(GTK_ENTRY(((struct editPatientData*)data)->ageEntry));
     const gchar *bpjs = gtk_entry_get_text(GTK_ENTRY(((struct editPatientData*)data)->bpjsEntry));
+    GtkWidget *label = ((struct editPatientData*)data)->label;
+
 
     //convert to strings
     char PIDstr[11];
@@ -332,18 +334,36 @@ void editPatientSaveClicked(GtkWidget *widget, gpointer data){
     //split birthdaystr into kota lahir and tanggal lahir
     char *token = strtok(birthdatestr, "/");
     char birthcity[20];
-    char Fbirthdatestr[20];
+    date Fbirthdate;
     if(token != NULL){
         strcpy(birthcity, token);
         token = strtok(NULL, "/");
         if(token != NULL){
-            strcpy(Fbirthdatestr, token);
+            Fbirthdate.date = atoi(token);
+            token = strtok(NULL, "/");
+            if(token != NULL){
+                Fbirthdate.month = atoi(token);
+                token = strtok(NULL, "/");
+                if(token != NULL){
+                    Fbirthdate.year = atoi(token);
+                }
+            }
         }
     }
 
+    char monthList[12][12] = {"Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"};
+
+    char birthdatestr2[20];
+    sprintf(birthdatestr2, "%d %s %d", Fbirthdate.date, monthList[Fbirthdate.month-1], Fbirthdate.year);
+
     //edit the data
-    modifyPatient(&pasien, PIDstr, namestr, addressstr, citystr, birthcity, Fbirthdatestr, atoi(agestr), bpjsstr);
-    closeWindow(widget, window);
+    int success = modifyPatient(&pasien, PIDstr, namestr, addressstr, citystr, birthcity, birthdatestr2, atoi(agestr), bpjsstr);
+    if(success == 0){
+        gtk_label_set_text(GTK_LABEL(label), "Data tidak ditemukan");
+    }
+    else{
+        gtk_label_set_text(GTK_LABEL(label), "Data berhasil diubah");
+    }
 }
 
 void editPatientClicked(GtkWidget *widget, gpointer data){
@@ -356,6 +376,7 @@ void editPatientClicked(GtkWidget *widget, gpointer data){
     GtkWidget *birthdateEntry;
     GtkWidget *ageEntry;
     GtkWidget *bpjsEntry;
+    GtkWidget *label;
     GtkWidget *saveButton;/*button untuk menyimpan data pasien*/
 
     DataPasien *pasien = (DataPasien*)data;
@@ -366,7 +387,10 @@ void editPatientClicked(GtkWidget *widget, gpointer data){
     window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
     gtk_window_set_title(GTK_WINDOW(window), "Edit Data Pasien");
     gtk_window_set_default_size(GTK_WINDOW(window), 500, 500);
-    editData->window = window;
+
+    //create label
+    label = gtk_label_new("");
+    editData->label = label;
 
     //create vbox
     vbox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
@@ -418,6 +442,7 @@ void editPatientClicked(GtkWidget *widget, gpointer data){
     gtk_box_pack_start(GTK_BOX(vbox), birthdateEntry, TRUE, TRUE, 0);
     gtk_box_pack_start(GTK_BOX(vbox), ageEntry, TRUE, TRUE, 0);
     gtk_box_pack_start(GTK_BOX(vbox), bpjsEntry, TRUE, TRUE, 0);
+    gtk_box_pack_start(GTK_BOX(vbox), label, TRUE, TRUE, 0);
     gtk_box_pack_start(GTK_BOX(vbox), saveButton, TRUE, TRUE, 0);
 
     gtk_container_add(GTK_CONTAINER(window), vbox);
