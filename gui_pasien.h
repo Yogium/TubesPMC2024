@@ -6,6 +6,7 @@
 #include <stdlib.h>
 #include "searchPatient.c"
 #include "deletePatient.c"
+#include "addPatient.c"
 
 #ifndef GUI_PASIEN_H
 
@@ -21,13 +22,71 @@ enum patientColumns{
     PATIENT_N_COLS
 };
 
+
 void getTextInput(GtkWidget *entry, gpointer data){
     const gchar *text = gtk_entry_get_text(GTK_ENTRY(entry));
 }
 #endif
 
+struct addPatientData{
+    DataPasien *pasien;
+    GtkWidget *entry_name;
+    GtkWidget *entry_address;
+    GtkWidget *entry_city;
+    GtkWidget *entry_birthdate;
+    GtkWidget *entry_age;
+    GtkWidget *entry_bpjs;
+    GtkWidget *entry_PID;
+    GtkWidget *label_confirm;
+};
 
-void addPatientClicked(GtkWidget *widget){
+void addPatientSaveClicked(GtkWidget *widget, gpointer data){
+    //taking the data from entries
+    DataPasien *pasien = ((struct addPatientData*)data)->pasien;
+    const gchar *name = gtk_entry_get_text(GTK_ENTRY(((struct addPatientData*)data)->entry_name));
+    const gchar *address = gtk_entry_get_text(GTK_ENTRY(((struct addPatientData*)data)->entry_address));
+    const gchar *city = gtk_entry_get_text(GTK_ENTRY(((struct addPatientData*)data)->entry_city));
+    const gchar *birthdate = gtk_entry_get_text(GTK_ENTRY(((struct addPatientData*)data)->entry_birthdate));
+    const gchar *age = gtk_entry_get_text(GTK_ENTRY(((struct addPatientData*)data)->entry_age));
+    const gchar *bpjs = gtk_entry_get_text(GTK_ENTRY(((struct addPatientData*)data)->entry_bpjs));
+    const gchar *PID = gtk_entry_get_text(GTK_ENTRY(((struct addPatientData*)data)->entry_PID));
+    GtkWidget *label_confirm = ((struct addPatientData*)data)->label_confirm;
+
+    //convert to strings
+    char namestr[50];
+    char addressstr[100];
+    char citystr[20];
+    char birthdatestr[20];
+    char agestr[3];
+    char bpjsstr[20];
+    char PIDstr[11];
+
+    strcpy(namestr, name);
+    strcpy(addressstr, address);
+    strcpy(citystr, city);
+    strcpy(birthdatestr, birthdate);
+    strcpy(agestr, age);
+    strcpy(bpjsstr, bpjs);
+    strcpy(PIDstr, PID);
+
+    //split birthdaystr into kota lahir and tanggal lahir
+    char *token = strtok(birthdatestr, "/");
+    char birthcity[20];
+    char Fbirthdatestr[20];
+    if(token != NULL){
+        strcpy(birthcity, token);
+        token = strtok(NULL, "/");
+        if(token != NULL){
+            strcpy(Fbirthdatestr, token);
+        }
+    }
+
+    //add the data
+    addPatient(&pasien, namestr, addressstr, citystr, birthcity, Fbirthdatestr, atoi(agestr), bpjsstr, PIDstr);
+    gtk_label_set_text(GTK_LABEL(label_confirm), "Data berhasil ditambahkan");
+}
+
+void addPatientClicked(GtkWidget *widget, gpointer data){
     GtkWidget *window;
     GtkWidget *vbox;
     GtkWidget *label_general;
@@ -40,6 +99,11 @@ void addPatientClicked(GtkWidget *widget){
     GtkWidget *entry_PID;
     GtkWidget *button_save;/*button untuk menyimpan data pasien*/
     GtkWidget *button_cancel;/*button untuk membatalkan input data pasien*/
+    GtkWidget *label_confirm;
+
+    struct addPatientData *addData = malloc(sizeof(struct addPatientData));
+    addData->pasien = (DataPasien*)data;
+
 
     //create window
     window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
@@ -55,34 +119,45 @@ void addPatientClicked(GtkWidget *widget){
     //create label name
     entry_name = gtk_entry_new();
     gtk_entry_set_placeholder_text(GTK_ENTRY(entry_name), "Nama Pasien");
+    addData->entry_name = entry_name;
 
     //create label address
     entry_address = gtk_entry_new();
     gtk_entry_set_placeholder_text(GTK_ENTRY(entry_address), "Alamat Pasien");
+    addData->entry_address = entry_address;
 
     //create label city
     entry_city = gtk_entry_new();
     gtk_entry_set_placeholder_text(GTK_ENTRY(entry_city), "Kota");
+    addData->entry_city = entry_city;
 
     //create label birthdate
     entry_birthdate= gtk_entry_new();
     gtk_entry_set_placeholder_text(GTK_ENTRY(entry_birthdate), "Tempat dan Tanggal Lahir (dalam format kota/dd/mm/yyyy)");
+    addData->entry_birthdate = entry_birthdate;
 
     //create label age
     entry_age= gtk_entry_new();
     gtk_entry_set_placeholder_text(GTK_ENTRY(entry_age), "Umur Pasien");
+    addData->entry_age = entry_age;
 
     //create label BPJS
     entry_bpjs= gtk_entry_new();
     gtk_entry_set_placeholder_text(GTK_ENTRY(entry_bpjs), "Nomor BPJS Pasien");
+    addData->entry_bpjs = entry_bpjs;
 
     //create label PID
     entry_PID= gtk_entry_new();
     gtk_entry_set_placeholder_text(GTK_ENTRY(entry_PID), "Patient ID");
+    addData->entry_PID = entry_PID;
+
+    //create label
+    label_confirm = gtk_label_new("");
+    addData->label_confirm = label_confirm;
 
     //save button
     button_save = gtk_button_new_with_label("Simpan");
-    g_signal_connect(button_save, "clicked", G_CALLBACK(closeWindow)/*insert fungsi add pasien*/, window);
+    g_signal_connect(button_save, "clicked", G_CALLBACK(addPatientSaveClicked), addData);
 
     //cancel button
     button_cancel = gtk_button_new_with_label("Batal");
@@ -97,6 +172,7 @@ void addPatientClicked(GtkWidget *widget){
     gtk_box_pack_start(GTK_BOX(vbox), entry_age, TRUE, TRUE, 0);
     gtk_box_pack_start(GTK_BOX(vbox), entry_bpjs, TRUE, TRUE, 0);
     gtk_box_pack_start(GTK_BOX(vbox), entry_PID, TRUE, TRUE, 0);
+    gtk_box_pack_start(GTK_BOX(vbox), label_confirm, TRUE, TRUE, 0);
     gtk_box_pack_start(GTK_BOX(vbox), button_save, TRUE, TRUE, 0);
     gtk_box_pack_start(GTK_BOX(vbox), button_cancel, TRUE, TRUE, 0);
 

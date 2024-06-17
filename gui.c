@@ -8,6 +8,7 @@
 #include "gui_commonfunc.h"
 #include "gui_sick.h"
 #include "searchPatientDetails.c"
+#include "gui_visit.h"
 
 enum controlColumns {
     COL_PATIENT_ID,
@@ -101,6 +102,8 @@ void visitClicked(GtkWidget *widget, gpointer data){
     GtkWidget *search_button;
     GtkWidget *back_button;
 
+    DataKunjungan *kunjungan = ((struct generalLL*)data)->kunjungan;
+
     window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
     gtk_window_set_title(GTK_WINDOW(window), "data kunjungan");
     gtk_window_set_default_size(GTK_WINDOW(window), 500, 500);
@@ -110,7 +113,7 @@ void visitClicked(GtkWidget *widget, gpointer data){
 
     //add button
     add_button = gtk_button_new_with_label("tambah data kunjungan");
-    //insert function for add button
+    g_signal_connect(add_button, "clicked", G_CALLBACK(addVisitClicked), kunjungan);
 
     //edit button
     edit_button = gtk_button_new_with_label("edit data kunjungan");
@@ -118,7 +121,7 @@ void visitClicked(GtkWidget *widget, gpointer data){
 
     //delete button
     delete_button = gtk_button_new_with_label("hapus data kunjungan");
-    //insert function for delete button
+    g_signal_connect(delete_button, "clicked", G_CALLBACK(visitDeleteClicked), kunjungan);
 
     //search button
     search_button = gtk_button_new_with_label("cari data kunjungan");

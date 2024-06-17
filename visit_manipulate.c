@@ -53,16 +53,17 @@ DataKunjungan* searchVisit(DataKunjungan *head, char *patientID){
 }
 
 //Fungsi untuk mengubah data kunjungan berdasarkan patientID
-DataKunjungan* updateVisit(DataKunjungan *head, char *patientID, DataKunjungan *newVisit){
+DataKunjungan* updateVisit(DataKunjungan *head, char *patientID, date tanggal, DataKunjungan *newVisit){
     DataKunjungan *temp = head;
     while(temp != NULL){
-        if(strcmp(temp->patientID, patientID) == 0){
+        if(strcmp(temp->patientID, patientID) == 0 && temp->tanggal.date == tanggal.date && temp->tanggal.month == tanggal.month && temp->tanggal.year == tanggal.year){
             temp->index = newVisit->index;
             temp->tanggal = newVisit->tanggal;
             strcpy(temp->patientID, newVisit->patientID);
             temp->diagnosis = newVisit->diagnosis;
             temp->tindakan = newVisit->tindakan;
             temp->control = newVisit->control;
+            free(newVisit);
             return head;
         }
         temp = temp->next;
@@ -94,34 +95,43 @@ int getIndex(DataKunjungan *head){
 }
 
 //Fungsi untuk mendapat untuk proses menambah data kunjungan
-void addVisitProcess(DataKunjungan **head){
-    int diagnosis, tindakan;
-    char patientID[11];
+void addVisitProcess(DataKunjungan **head, char *patientID, int diagnosis, int tindakan, char *controlstr, char* tanggalstr){
     int index = getIndex(*head);
+    //parse date
+    int Cdate, Cmonth, Cyear;
+    int Tdate, Tmonth, Tyear;
+    //parse control date
+    char *token = strtok(controlstr, "/");
+    Cdate = atoi(token);
+    token = strtok(NULL, "/");
+    Cmonth = atoi(token);
+    token = strtok(NULL, "/");
+    Cyear = atoi(token);
+    //parse tanggal date
+    token = strtok(tanggalstr, "/");
+    Tdate = atoi(token);
+    token = strtok(NULL, "/");
+    Tmonth = atoi(token);
+    token = strtok(NULL, "/");
+    Tyear = atoi(token);
+
     date tanggal, control;
-    printf("Masukkan tanggal kunjungan (dd-mm-yyyy): ");
-    scanf("%d-%d-%d", &tanggal.date, &tanggal.month, &tanggal.year);
-    printf("Masukkan patient ID: ");
-    scanf("%s", patientID);
-    printf("Masukkan diagnosis: ");
-    scanf("%d", &diagnosis);
-    printf("Masukkan tindakan: ");
-    scanf("%d", &tindakan);
-    printf("Masukkan tanggal control (dd-mm-yyyy): ");
-    scanf("%d-%d-%d", &control.date, &control.month, &control.year);
+    tanggal.date = Tdate;
+    tanggal.month = Tmonth;
+    tanggal.year = Tyear;
+    control.date = Cdate;
+    control.month = Cmonth;
+    control.year = Cyear;
     DataKunjungan *newVisit = createVisit(index, tanggal, patientID, diagnosis, tindakan, control);
     *head = addVisit(*head, newVisit);
 }
 
 //Fungsi untuk mendapat untuk proses menghapus data kunjungan
-void deleteVisit(DataKunjungan **head){
-    char patientID[11];
-    printf("Masukkan patient ID: ");
-    scanf("%s", patientID);
+void deleteVisit(DataKunjungan **head, char* patientID, date tanggal){
     DataKunjungan *temp = *head;
     DataKunjungan *prev = NULL;
     while(temp != NULL){
-        if(strcmp(temp->patientID, patientID) == 0){
+        if(strcmp(temp->patientID, patientID) == 0 && temp->tanggal.date == tanggal.date && temp->tanggal.month == tanggal.month && temp->tanggal.year == tanggal.year){
             if(prev == NULL){
                 *head = temp->next;
                 printf("Data kunjungan berhasil dihapus\n");
@@ -138,22 +148,25 @@ void deleteVisit(DataKunjungan **head){
 }
 
 //Fungsi untuk mendapat untuk proses mengubah data kunjungan
-void changeVisit(DataKunjungan **head){
-    int diagnosis, tindakan;
-    char patientID[11];
+void changeVisit(DataKunjungan **head, char* patientID, char* dateStr, char* controlStr, int diagnosis, int tindakan){
     date tanggal, control;
-    printf("Masukkan patient ID: ");
-    scanf("%s", patientID);
-    printf("Masukkan tanggal kunjungan (dd-mm-yyyy): ");
-    scanf("%d-%d-%d", &tanggal.date, &tanggal.month, &tanggal.year);
-    printf("Masukkan diagnosis: ");
-    scanf("%d", &diagnosis);
-    printf("Masukkan tindakan: ");
-    scanf("%d", &tindakan);
-    printf("Masukkan tanggal control (dd-mm-yyyy): ");
-    scanf("%d-%d-%d", &control.date, &control.month, &control.year);
+    char *token = strtok(dateStr, "/");
+    tanggal.date = atoi(token);
+    token = strtok(NULL, "/");
+    tanggal.month = atoi(token);
+    token = strtok(NULL, "/");
+    tanggal.year = atoi(token);
+
+    token = strtok(controlStr, "/");
+    control.date = atoi(token);
+    token = strtok(NULL, "/");
+    control.month = atoi(token);
+    token = strtok(NULL, "/");
+    control.year = atoi(token);
+
     DataKunjungan *newVisit = createVisit(getIndex(*head), tanggal, patientID, diagnosis, tindakan, control);
-    *head = updateVisit(*head, patientID, newVisit);
+
+    *head = updateVisit(*head, patientID, tanggal, newVisit);
 }
 
 //Fungsi untuk mendapat untuk proses mencari data kunjungan
@@ -169,3 +182,17 @@ void searchVisitProcess(DataKunjungan *head){
     }
 }
 
+int main(){
+    DataKunjungan *head = NULL;
+    addVisitProcess(&head, "1234567890", 0, 0, "1/1/2021", "1/1/2021");
+    addVisitProcess(&head, "1234567890", 1, 1, "1/1/2021", "1/1/2021");
+    addVisitProcess(&head, "1234567890", 2, 2, "1/1/2021", "1/1/2021");
+    addVisitProcess(&head, "1234567890", 3, 3, "1/1/2021", "1/1/2021");
+    printVisit(head);
+    deleteVisit(&head, "1234567890", (date){1, 1, 2021});
+    printVisit(head);
+    changeVisit(&head, "1234567890", "1/1/2021", "1/1/2021", 0, 0);
+    printVisit(head);
+    searchVisitProcess(head);
+    return 0;
+}

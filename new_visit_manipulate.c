@@ -14,20 +14,19 @@ Deskripsi: fungsi untuk melakukan hal di bawah kepada data kunjungan:
 #include "LinkedList.h"
 
 //menambahkan data kunjungan ke linked list
-void addVisit(DataKunjungan **head, char* tanggal, char *patientID, int diagnosis, int tindakan, char* control) {
+void addVisit(DataKunjungan **head, char* tanggal, char *patientID, int diagnosis, int tindakanID, char* control) {
     DataKunjungan *newVisit = malloc(sizeof(DataKunjungan)); 
-
     DataKunjungan *temp = *head;
-    while (temp != NULL && temp->next != NULL) {
+    if(temp == NULL){
+        newVisit->index = 0;}
+    else{
+    while(temp->next != NULL){
         temp = temp->next;
+    } 
+    newVisit->index = temp->index + 1;
     }
 
-    if (temp != NULL) {
-        newVisit->index = temp->index + 1; // Dimasukkan ke index + 1
-    } 
-    else {
-        newVisit->index = 1; // Bila linked list kosong, index = 1
-    }
+    newVisit->index = 0;
 
     //parsing tanggal kunjungan
     char *token = strtok(tanggal, "/");
@@ -48,7 +47,7 @@ void addVisit(DataKunjungan **head, char* tanggal, char *patientID, int diagnosi
     //masukkan ke newvisit
     strcpy(newVisit->patientID, patientID);
     newVisit->diagnosis = diagnosis;
-    newVisit->tindakan = tindakan;
+    newVisit->tindakan = tindakanID;
     newVisit->next = NULL;
 
     //masukkan ke linked list
@@ -75,7 +74,7 @@ void deleteVisit(DataKunjungan **head, char *patientID, date tanggal){
     }
 
     //cari data yang akan dihapus
-    while(temp != NULL && (strcmp(temp->patientID, patientID) != 0 || temp->tanggal.date != tanggal.date || temp->tanggal.month != tanggal.month || temp->tanggal.year != tanggal.year)){
+    while(temp != NULL && (strcmp(temp->patientID, patientID) != 0 && (temp->tanggal.date != tanggal.date || temp->tanggal.month != tanggal.month || temp->tanggal.year != tanggal.year))){
         prev = temp;
         temp = temp->next;
     }
@@ -92,7 +91,7 @@ void deleteVisit(DataKunjungan **head, char *patientID, date tanggal){
 }
 
 //fungsi untuk mengubah data kunjungan
-void updateVisit(DataKunjungan **head, char *patientID, date tanggal, char* controlStr, int diagnosis, int tindakan){
+void updateVisit(DataKunjungan **head, char *patientID, date tanggal, char* controlStr, int diagnosis, int tindakanID){
     DataKunjungan *temp = *head;
 
     while(temp != NULL){
@@ -104,7 +103,7 @@ void updateVisit(DataKunjungan **head, char *patientID, date tanggal, char* cont
             token = strtok(NULL, "/");
             temp->control.year = atoi(token);
             temp->diagnosis = diagnosis;
-            temp->tindakan = tindakan;
+            temp->tindakan = tindakanID;
             return;
         }
         temp = temp->next;
@@ -146,7 +145,7 @@ void selector(DataKunjungan *head){
                 char tanggalStr[20];
                 char patientID[11];
                 int diagnosis;
-                int tindakan;
+                int tindakanID;
                 char control[20];
     while(exit == 0){
         printf("Pilih menu:\n");
@@ -163,10 +162,10 @@ void selector(DataKunjungan *head){
                 printf("Diagnosis: ");
                 scanf("%d", &diagnosis);
                 printf("Tindakan: ");
-                scanf("%d", &tindakan);
+                scanf("%d", &tindakanID);
                 printf("Tanggal kontrol: ");
                 scanf("%s", control);
-                addVisit(&head, tanggalStr, patientID, diagnosis, tindakan, control);
+                addVisit(&head, tanggalStr, patientID, diagnosis, tindakanID, control);
                 break;
             case 2:
                 //hapus data kunjungan
@@ -196,10 +195,10 @@ void selector(DataKunjungan *head){
                 printf("Diagnosis: ");
                 scanf("%d", &diagnosis);
                 printf("Tindakan: ");
-                scanf("%d", &tindakan);
+                scanf("%d", &tindakanID);
                 printf("Tanggal kontrol: ");
                 scanf("%s", control);
-                updateVisit(&head, patientID, tanggal, control, diagnosis, tindakan);
+                updateVisit(&head, patientID, tanggal, control, diagnosis, tindakanID);
                 break;
             case 4:
                 //cari data kunjungan
