@@ -117,7 +117,7 @@ void visitClicked(GtkWidget *widget, gpointer data){
 
     //edit button
     edit_button = gtk_button_new_with_label("edit data kunjungan");
-    //insert function for edit button
+    g_signal_connect(edit_button, "clicked", G_CALLBACK(visitEditClicked), kunjungan);
 
     //delete button
     delete_button = gtk_button_new_with_label("hapus data kunjungan");
@@ -125,7 +125,7 @@ void visitClicked(GtkWidget *widget, gpointer data){
 
     //search button
     search_button = gtk_button_new_with_label("cari data kunjungan");
-    //insert function for search button
+    g_signal_connect(search_button, "clicked", G_CALLBACK(searchVisitClicked), kunjungan);
 
     //back button
     back_button = gtk_button_new_with_label("kembali");

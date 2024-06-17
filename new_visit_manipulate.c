@@ -62,7 +62,7 @@ void addVisit(DataKunjungan **head, char* tanggal, char *patientID, int diagnosi
 }
 
 //fungsi untuk delete visit
-void deleteVisit(DataKunjungan **head, char *patientID, date tanggal){
+int deleteVisit(DataKunjungan **head, char *patientID, date tanggal){
     DataKunjungan *temp = *head;
     DataKunjungan *prev = NULL;
 
@@ -70,7 +70,7 @@ void deleteVisit(DataKunjungan **head, char *patientID, date tanggal){
     if(temp != NULL && strcmp(temp->patientID, patientID) == 0 && temp->tanggal.date == tanggal.date && temp->tanggal.month == tanggal.month && temp->tanggal.year == tanggal.year){
         *head = temp->next;
         free(temp);
-        return;
+        return 1;
     }
 
     //cari data yang akan dihapus
@@ -82,16 +82,17 @@ void deleteVisit(DataKunjungan **head, char *patientID, date tanggal){
     //jika data tidak ditemukan
     if(temp == NULL){
         printf("Data tidak ditemukan\n");
-        return;
+        return 0;
     }
 
     //hapus data
     prev->next = temp->next;
     free(temp);
+    return 1;
 }
 
 //fungsi untuk mengubah data kunjungan
-void updateVisit(DataKunjungan **head, char *patientID, date tanggal, char* controlStr, int diagnosis, int tindakanID){
+int updateVisit(DataKunjungan **head, char *patientID, date tanggal, char* controlStr, int diagnosis, int tindakanID){
     DataKunjungan *temp = *head;
 
     while(temp != NULL){
@@ -104,10 +105,11 @@ void updateVisit(DataKunjungan **head, char *patientID, date tanggal, char* cont
             temp->control.year = atoi(token);
             temp->diagnosis = diagnosis;
             temp->tindakan = tindakanID;
-            return;
+            return 1;
         }
         temp = temp->next;
     }
+    return 0;
 }
 
 //fungsi untuk mencari data kunjungan
