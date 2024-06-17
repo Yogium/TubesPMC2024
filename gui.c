@@ -7,6 +7,7 @@
 #include "gui_cashflow.h"
 #include "gui_commonfunc.h"
 #include "gui_sick.h"
+#include "searchPatientDetails.c"
 
 enum controlColumns {
     COL_PATIENT_ID,
@@ -224,6 +225,39 @@ void controlClicked(GtkWidget *widget, gpointer data){
     
 }
 
+struct diagGData{
+    GtkWidget *labelName;
+    GtkWidget *entryPID;
+    DataPasien *pasien;
+    DataKunjungan *kunjungan;
+    GtkListStore *diagList;
+};
+
+void diagSearchClicked(GtkWidget *widget, gpointer data){
+    DataPasien *pasien = ((struct diagGData*)data)->pasien;
+    DataKunjungan *kunjungan = ((struct diagGData*)data)->kunjungan;
+    const char *PID = gtk_entry_get_text(GTK_ENTRY(((struct diagGData*)data)->entryPID));
+    char *PIDCopy = malloc(strlen(PID) + 1);
+    PIDCopy = strcpy(PIDCopy, PID);
+
+    DataDiag *head = searchPatientDetails(pasien, kunjungan, PIDCopy);
+    DataPenyakit *temp = head->dataPenyakit; 
+    GtkListStore *diagList = ((struct diagGData*)data)->diagList;
+    GtkTreeIter iter;
+    if(head == NULL){
+        return;
+    }
+    GtkWidget *labelName = ((struct diagGData*)data)->labelName;
+    char name[100];
+    sprintf(name, "Nama Pasien: %s", head->nama);
+    gtk_label_set_text(GTK_LABEL(labelName), name);
+    gtk_list_store_clear(diagList);
+    while(temp != NULL){
+        gtk_list_store_insert_with_values(diagList, &iter, -1, COL_DIAG_NAME, temp->diagnosis, COL_DIAG_TINDAKAN, temp->tindakan, COL_DIAG_DATE, temp->tanggalControl, -1);
+        temp = temp->next;
+    }
+}
+
 void diagClicked(GtkWidget *widget, gpointer data){
     GtkWidget *window;
     GtkWidget *vbox;
@@ -234,6 +268,11 @@ void diagClicked(GtkWidget *widget, gpointer data){
     GtkTreeViewColumn *column;
     GtkWidget *view;
     GtkWidget *exitButton;
+
+    //declare the head for LL
+    struct diagGData *diagData = malloc(sizeof(struct diagGData));
+    diagData->kunjungan = ((struct generalLL*)data)->kunjungan;
+    diagData->pasien = ((struct generalLL*)data)->pasien;
 
     //create window
     window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
@@ -249,10 +288,12 @@ void diagClicked(GtkWidget *widget, gpointer data){
 
     //create label
     patientNameLabel = gtk_label_new("Nama Pasien: ");
+    diagData->labelName = patientNameLabel;
 
     //create entry
     entry_PID = gtk_entry_new();
     gtk_entry_set_placeholder_text(GTK_ENTRY(entry_PID), "Masukkan Patient ID");
+    diagData->entryPID = entry_PID;
 
     //create list
     diagList = gtk_list_store_new(DIAG_N_COLUMNS, G_TYPE_STRING, G_TYPE_STRING, G_TYPE_STRING);
@@ -267,9 +308,14 @@ void diagClicked(GtkWidget *widget, gpointer data){
     column = gtk_tree_view_column_new_with_attributes("Tanggal Control", gtk_cell_renderer_text_new(), "text", COL_DIAG_DATE, NULL);
     gtk_tree_view_append_column(GTK_TREE_VIEW(view), column);
 
+    diagData->diagList = diagList;
+
     //create exit button
     exitButton = gtk_button_new_with_label("kembali");
     g_signal_connect(exitButton, "clicked", G_CALLBACK(closeWindow), window);
+
+    //search button signal connect
+    g_signal_connect(searchButton, "clicked", G_CALLBACK(diagSearchClicked), diagData);
 
     //add entry to vbox
     gtk_box_pack_start(GTK_BOX(vbox), entry_PID, TRUE, TRUE, 0);
@@ -414,7 +460,7 @@ int main(int argc, char *argv[]){
 
     //diagnosis button
     diag_button = gtk_button_new_with_label("Riwayat Sakit Pasien");
-    g_signal_connect(diag_button, "clicked", G_CALLBACK(diagClicked), NULL);
+    g_signal_connect(diag_button, "clicked", G_CALLBACK(diagClicked), &LL);
 
     //cash button
     cash_button = gtk_button_new_with_label("Data Kas/Cashflow");

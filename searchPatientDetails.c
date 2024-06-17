@@ -17,7 +17,7 @@ typedef struct DataPenyakit {
 typedef struct DataDiag {
     DataPenyakit* dataPenyakit;
     char nama[100];
-    char patientID[11];
+    char patientID[11];    
 } DataDiag;
 
 //  Mencari detail pasien (parameter pasienHead kunjunganHead dan ID)
@@ -85,33 +85,33 @@ void freeResult(DataDiag* result) {
     free(result);
 }
 
-int main() {
-    DataPasien* pasienHead = NULL;
-    DataKunjungan* kunjunganHead = NULL;
-    char pasienID[11];
-    printf("Masukkan ID pasien untuk mencari: ");
-    fgets(pasienID, sizeof(pasienID), stdin);
-    pasienID[strcspn(pasienID, "\n")] = '\0';
+// int main() {
+//     DataPasien* pasienHead = NULL;
+//     DataKunjungan* kunjunganHead = NULL;
+//     char pasienID[11];
+//     printf("Masukkan ID pasien untuk mencari: ");
+//     fgets(pasienID, sizeof(pasienID), stdin);
+//     pasienID[strcspn(pasienID, "\n")] = '\0';
 
-    DataDiag* result = searchPatientDetails(pasienHead, kunjunganHead, pasienID);
+//     DataDiag* result = searchPatientDetails(pasienHead, kunjunganHead, pasienID);
 
-    if (strlen(result->nama) == 0) {
-        printf("Pasien dengan ID '%s' tidak ditemukan.\n", pasienID);
-    } else {
-        printf("Nama: %s\n", result->nama);
-        printf("ID Pasien: %s\n", result->patientID);
-        DataPenyakit* temp = result->dataPenyakit;
-        if (temp == NULL) {
-            printf("Tidak ada data kunjungan untuk pasien dengan ID '%s'.\n", pasienID);
-        } else {
-            printf("Terdeteksi kunjungan dengan data dibawah:\n");
-            while (temp != NULL) {
-                printf("Diagnosis: %s\n", temp->diagnosis);
-                printf("Tindakan: %s\n", temp->tindakan);
-                printf("Tanggal kontrol: %s\n", temp->tanggalControl);
-                printf("\n");
-                temp = temp->next;
-            }
-        }
-    }
-}
+//     if (strlen(result->nama) == 0) {
+//         printf("Pasien dengan ID '%s' tidak ditemukan.\n", pasienID);
+//     } else {
+//         printf("Nama: %s\n", result->nama);
+//         printf("ID Pasien: %s\n", result->patientID);
+//         DataPenyakit* temp = result->dataPenyakit;
+//         if (temp == NULL) {
+//             printf("Tidak ada data kunjungan untuk pasien dengan ID '%s'.\n", pasienID);
+//         } else {
+//             printf("Terdeteksi kunjungan dengan data dibawah:\n");
+//             while (temp != NULL) {
+//                 printf("Diagnosis: %s\n", temp->diagnosis);
+//                 printf("Tindakan: %s\n", temp->tindakan);
+//                 printf("Tanggal kontrol: %s\n", temp->tanggalControl);
+//                 printf("\n");
+//                 temp = temp->next;
+//             }
+//         }
+//     }
+// }
