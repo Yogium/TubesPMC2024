@@ -216,8 +216,8 @@ void selector(DataKunjungan *head){
     }
 }
 
-int main(){
-    DataKunjungan *head = NULL;
-    parseDataKunjunganFromFile("Riwayat_Datang.csv", &head);
-    selector(head);
-}
+// int main(){
+//     DataKunjungan *head = NULL;
+//     parseDataKunjunganFromFile("Riwayat_Datang.csv", &head);
+//     selector(head);
+// }
