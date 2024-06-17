@@ -11,20 +11,22 @@
 #include "parsingDate.h"
 
 //parameters sbg input
-void addPatient(DataPasien** head, char* nama, char* alamat, char* kota, char* tempatLahir, char* tglLahir, int umur, char* BPJS, char* patientID) {
+void addPatient(DataPasien** head, char* nama, char* alamat, char* kota, char* tempatLahir, date tglLahir, int umur, char* BPJS, char* patientID) {
     DataPasien* newNode = createDataPasienNode();
     DataPasien* temp = *head;
 
-    while (temp != NULL && temp->next != NULL) {
-        temp = temp->next;
-    }
+    // while (temp != NULL && temp->next != NULL) {
+    //     temp = temp->next;
+    // }
 
-    if (temp != NULL) {
-        newNode->index = temp->index + 1; // Dimasukkan ke index + 1
-    } 
-    else {
-        newNode->index = 1; // Bila linked list kosong, index = 1
-    }
+    // if (temp != NULL) {
+    //     newNode->index = temp->index + 1; // Dimasukkan ke index + 1
+    // } 
+    // else {
+    //     newNode->index = 1; // Bila linked list kosong, index = 1
+    // }
+
+    newNode->index = 0;
 
     strcpy(newNode->nama, nama);
     strcpy(newNode->alamat, alamat);
@@ -32,12 +34,9 @@ void addPatient(DataPasien** head, char* nama, char* alamat, char* kota, char* t
     strcpy(newNode->tempatLahir, tempatLahir);
 
     char originalDate[20]; // Buffer untuk menyimpan tanggal yang sudah diformat
-    char *token = strtok(tglLahir, "/");
-    newNode->tgllahir.date = atoi(token);
-    token = strtok(NULL, "/");
-    newNode->tgllahir.month = atoi(token);
-    token = strtok(NULL, "/");
-    newNode->tgllahir.year = atoi(token); 
+    newNode->tgllahir.date = tglLahir.date;
+    newNode->tgllahir.month = tglLahir.month;
+    newNode->tgllahir.year = tglLahir.year;
     if (newNode->tgllahir.date == 0 || newNode->tgllahir.month == 0 || newNode->tgllahir.year == 0) {
         printf("Invalid date format.\n");
         free(newNode);

@@ -70,19 +70,28 @@ void addPatientSaveClicked(GtkWidget *widget, gpointer data){
     strcpy(PIDstr, PID);
 
     //split birthdaystr into kota lahir and tanggal lahir
-    char *token = strtok(birthdatestr, "/");
     char birthcity[20];
-    char Fbirthdatestr[20];
+    date Fbirthdate;
+    char *token = strtok(birthdatestr, "/");
     if(token != NULL){
         strcpy(birthcity, token);
         token = strtok(NULL, "/");
         if(token != NULL){
-            strcpy(Fbirthdatestr, token);
+            Fbirthdate.date = atoi(token);
+            token = strtok(NULL, "/");
+            if(token != NULL){
+                Fbirthdate.month = atoi(token);
+                token = strtok(NULL, "/");
+                if(token != NULL){
+                    Fbirthdate.year = atoi(token);
+                }
+            }
         }
     }
+    
 
     //add the data
-    addPatient(&pasien, namestr, addressstr, citystr, birthcity, Fbirthdatestr, atoi(agestr), bpjsstr, PIDstr);
+    addPatient(&pasien, namestr, addressstr, citystr, birthcity, Fbirthdate, atoi(agestr), bpjsstr, PIDstr);
     gtk_label_set_text(GTK_LABEL(label_confirm), "Data berhasil ditambahkan");
 }
 
