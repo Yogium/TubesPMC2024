@@ -13,6 +13,7 @@
 #include <ctype.h>
 #include "struct.h"
 #include "parsingDate.h"
+#include "write.h"
 
 // Fungsi untuk membuat node baru dari DataPasien
 DataPasien* createDataPasienNode() {
@@ -81,6 +82,7 @@ void parseDataPasienFromFile(const char* filename, DataPasien** head) {
         }
     }
     fclose(file);
+    writeBackupDataPasien(*head);
 }
 
 // Fungsi untuk mencetak seluruh data pasien dari linked list
@@ -188,6 +190,8 @@ void parseDataKunjunganFromFile(const char* filename, DataKunjungan** head) {
         }
     }
     fclose(file);
+    writeBackupDataKunjungan(*head);
+
 }
 
 // Fungsi untuk mencetak seluruh data kunjungan dari linked list

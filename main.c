@@ -16,6 +16,7 @@
 #include "cashflow.c"
 #include "controlPatient.c"
 #include "penyakit.c"
+#include "write.h"
 
 int main() {
     DataPasien* pasienHead = NULL;
@@ -101,6 +102,10 @@ int main() {
                 ;
                 break;
             case 0:
+                // Menulis data pasien ke file
+                writeDataPasien(pasienHead);
+                // Menulis data kunjungan ke file
+                writeDataKunjungan(kunjunganHead);
                 exit(0);
                 break;
             default:

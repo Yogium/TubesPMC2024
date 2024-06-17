@@ -17,6 +17,8 @@ extern char penyakit[4][20] = {"Dehidrasi", "Keseleo", "Masuk Angin", "Pusing"};
 
 extern Tindakan tindakan[6] = {{"Pendaftaran", 15000}, {"Pemeriksaan", 125000}, {"Vaksinasi", 100000}, {"Cek gula darah", 25000}, {"Pemasangan infus", 125000}, {"Pengobatan", 150000}};
 
+extern char bulan[12][20] = {"Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"};
+
 //struct untuk tanggal
 typedef struct{
     int date;
