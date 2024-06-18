@@ -155,6 +155,7 @@ void controlSearchClicked(GtkWidget *widget, gpointer data){
     ctrlist *temp = controlLLHead;
     GtkListStore *controlList = (((struct controlStruct*)data)->controlList);
     GtkTreeIter iter;
+    gtk_list_store_clear(controlList);
     if(controlLLHead == NULL){
         return;
     }
