@@ -49,20 +49,21 @@ ctrlist* findPatientsByControlDate(DataPasien* pasienHead, DataKunjungan* kunjun
                 }
 
             }
-            return ctrlistHead;
     }
 
     // Cari nama pasien
-    while(ctrlistHead != NULL) {
-        while(ctrlistHead->nama[0] == '\0'){
-            if(strcmp(ctrlistHead->patientID, pasienTemp->patientID) == 0){
-                strcpy(ctrlistHead->nama, pasienTemp->nama);
+    ctrlist* ctrltemp = ctrlistHead;
+    while(ctrltemp != NULL) {
+        while(ctrtemp->nama[0] == '\0'){
+            if(strcmp(ctrtemp->patientID, pasienTemp->patientID) == 0){
+                strcpy(ctrtemp->nama, pasienTemp->nama);
                 pasienTemp = pasienHead;//rewind temp
                 break;
             }else{
                 pasienTemp = pasienTemp->next;
             }
         }
+        ctrtemp = ctrtemp->next;
     }
     if (!found) {
         printf("Tidak ada pasien yang kontrol pada tanggal tersebut.\n");
